@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Ansicht – Antworten</title>
+  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1QIEr0IjLVQx-WlYYG1iRo08LmyuqWXY",
+      authDomain: "cg-adventskalender.firebaseapp.com",
+      projectId: "cg-adventskalender",
+      storageBucket: "cg-adventskalender.firebasestorage.app",
+      messagingSenderId: "823914577697",
+      appId: "1:823914577697:web:5885b5e51513a21bd80860"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function loadAllAnswers() {
+      const container = document.getElementById("results");
+      container.innerHTML = "<h2>Antworten</h2>";
+      const usernames = {};
+      const namesSnap = await db.collection("usernames").get();
+      namesSnap.forEach(doc => usernames[doc.id] = doc.data().name);
+
+      const snapshot = await db.collection("adventkalender").get();
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const name = usernames[doc.id] || "(Kein Name)";
+        const userDiv = document.createElement("div");
+        userDiv.style.marginBottom = "1em";
+        userDiv.innerHTML = `<strong>${name}</strong> (${doc.id})<br>`;
+        for (let i = 1; i <= 24; i++) {
+          const key = "tag" + i;
+          if (data[key]) {
+            userDiv.innerHTML += `Tag ${i}: ${data[key]}<br>`;
+          }
+        }
+        container.appendChild(userDiv);
+      });
+    }
+
+    window.onload = loadAllAnswers;
+  </script>
+</head>
+<body>
+  <h1>Admin-Übersicht: Adventskalender-Antworten</h1>
+  <div id="results">Lade Antworten...</div>
+</body>
+</html>

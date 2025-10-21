@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Adventskalender</title>
+  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1QIEr0IjLVQx-WlYYG1iRo08LmyuqWXY",
+      authDomain: "cg-adventskalender.firebaseapp.com",
+      projectId: "cg-adventskalender",
+      storageBucket: "cg-adventskalender.firebasestorage.app",
+      messagingSenderId: "823914577697",
+      appId: "1:823914577697:web:5885b5e51513a21bd80860"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
+    .hidden { display: none; }
+    .door { margin-bottom: 20px; padding: 10px; background: #fff; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>🎄 Adventskalender</h1>
+  <div id="login-section">
+    <input type="email" id="email" placeholder="E-Mail"><br>
+    <input type="password" id="password" placeholder="Passwort"><br>
+    <button onclick="login()">Login</button>
+    <button onclick="signup()">Registrieren</button>
+  </div>
+
+  <div id="calendar" class="hidden">
+    <h2>Willkommen, <span id="username">Nutzer</span>!</h2>
+    <p id="progress">Lade Fortschritt...</p>
+    <div id="doors"></div>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    const correctAnswers = { tag1: "Schnee" };
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("login-section").classList.add("hidden");
+        document.getElementById("calendar").classList.remove("hidden");
+        loadName(user.uid);
+        loadAnswers(user.uid);
+      }
+    });
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, pass).catch(e => alert(e.message));
+    }
+
+    function signup() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      auth.createUserWithEmailAndPassword(email, pass).then(() => {
+        alert("Registrierung erfolgreich!");
+      }).catch(e => alert(e.message));
+    }
+
+    function logout() {
+      auth.signOut().then(() => location.reload());
+    }
+
+    function loadName(uid) {
+      db.collection("usernames").doc(uid).get().then(doc => {
+        if (doc.exists) {
+          document.getElementById("username").innerText = doc.data().name || "Nutzer";
+        }
+      });
+    }
+
+    function loadAnswers(uid) {
+      const doorsDiv = document.getElementById("doors");
+      doorsDiv.innerHTML = "";
+      db.collection("adventkalender").doc(uid).get().then(doc => {
+        let data = doc.exists ? doc.data() : {};
+        let answeredCount = 0;
+
+        for (let day = 1; day <= 24; day++) {
+          const key = "tag" + day;
+          const value = data[key] || "";
+          if (value) answeredCount++;
+          const door = document.createElement("div");
+          door.className = "door";
+          door.innerHTML = `
+            <h3>Türchen ${day}</h3>
+            <input type="text" id="answer${day}" value="${value}" placeholder="Antwort hier eingeben">
+            <button onclick="submitAnswer(${day})">Absenden</button>
+            <div id="status${day}">${value ? "✅" : ""}</div>
+          `;
+          doorsDiv.appendChild(door);
+        }
+
+        document.getElementById("progress").innerText = \`Du hast \${answeredCount}/24 Türchen beantwortet.\`;
+      });
+    }
+
+    function submitAnswer(day) {
+      const user = auth.currentUser;
+      if (!user) return;
+      const val = document.getElementById("answer" + day).value.trim();
+      const key = "tag" + day;
+      db.collection("adventkalender").doc(user.uid)
+        .set({ [key]: val }, { merge: true })
+        .then(() => {
+          const status = document.getElementById("status" + day);
+          if (correctAnswers[key] && correctAnswers[key].toLowerCase() === val.toLowerCase()) {
+            status.innerText = "✅ Richtig!";
+          } else if (correctAnswers[key]) {
+            status.innerText = "❌ Falsch!";
+          } else {
+            status.innerText = "✅ Gespeichert!";
+          }
+          loadAnswers(user.uid);
+        });
+    }
+  </script>
+</body>
+</html>
