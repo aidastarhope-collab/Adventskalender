@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Adventskalender</title>
+  <meta charset="UTF-8" />
+  <title>Adventskalender Login</title>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js"></script>
   <script>
     const firebaseConfig = {
@@ -15,114 +14,96 @@
       messagingSenderId: "823914577697",
       appId: "1:823914577697:web:5885b5e51513a21bd80860"
     };
-
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.firestore();
   </script>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
+    body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
     .hidden { display: none; }
-    .door { margin-bottom: 20px; padding: 10px; background: #fff; border-radius: 5px; }
+    .door { background: #fff; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
   </style>
 </head>
 <body>
   <h1>🎄 Adventskalender</h1>
-  <div id="login-section">
-    <input type="email" id="email" placeholder="E-Mail"><br>
-    <input type="password" id="password" placeholder="Passwort"><br>
+  <div id="login">
+    <input id="username" placeholder="Benutzername"><br>
+    <input id="password" placeholder="Passwort" type="password"><br>
     <button onclick="login()">Login</button>
-    <button onclick="signup()">Registrieren</button>
+    <div id="login-msg"></div>
   </div>
 
   <div id="calendar" class="hidden">
-    <h2>Willkommen, <span id="username">Nutzer</span>!</h2>
-    <p id="progress">Lade Fortschritt...</p>
+    <h2>Willkommen, <span id="userLabel"></span>!</h2>
+    <p id="progress"></p>
     <div id="doors"></div>
     <button onclick="logout()">Logout</button>
   </div>
 
   <script>
-    const correctAnswers = { tag1: "Schnee" };
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById("login-section").classList.add("hidden");
-        document.getElementById("calendar").classList.remove("hidden");
-        loadName(user.uid);
-        loadAnswers(user.uid);
-      }
-    });
+    let currentUser = null;
 
     function login() {
-      const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-      auth.signInWithEmailAndPassword(email, pass).catch(e => alert(e.message));
-    }
+      const name = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      if (!name || !pass) return;
 
-    function signup() {
-      const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-      auth.createUserWithEmailAndPassword(email, pass).then(() => {
-        alert("Registrierung erfolgreich!");
-      }).catch(e => alert(e.message));
+      db.collection("users").doc(name).get().then(doc => {
+        if (!doc.exists) {
+          document.getElementById("login-msg").innerText = "Benutzer nicht gefunden.";
+          return;
+        }
+        if (doc.data().password !== pass) {
+          document.getElementById("login-msg").innerText = "Falsches Passwort.";
+          return;
+        }
+        currentUser = name;
+        document.getElementById("userLabel").innerText = name;
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("calendar").classList.remove("hidden");
+        loadAnswers();
+      });
     }
 
     function logout() {
-      auth.signOut().then(() => location.reload());
+      currentUser = null;
+      document.getElementById("calendar").classList.add("hidden");
+      document.getElementById("login").classList.remove("hidden");
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
     }
 
-    function loadName(uid) {
-      db.collection("usernames").doc(uid).get().then(doc => {
-        if (doc.exists) {
-          document.getElementById("username").innerText = doc.data().name || "Nutzer";
-        }
-      });
-    }
-
-    function loadAnswers(uid) {
-      const doorsDiv = document.getElementById("doors");
-      doorsDiv.innerHTML = "";
-      db.collection("adventkalender").doc(uid).get().then(doc => {
-        let data = doc.exists ? doc.data() : {};
-        let answeredCount = 0;
-
-        for (let day = 1; day <= 24; day++) {
-          const key = "tag" + day;
-          const value = data[key] || "";
-          if (value) answeredCount++;
-          const door = document.createElement("div");
-          door.className = "door";
-          door.innerHTML = `
-            <h3>Türchen ${day}</h3>
-            <input type="text" id="answer${day}" value="${value}" placeholder="Antwort hier eingeben">
-            <button onclick="submitAnswer(${day})">Absenden</button>
-            <div id="status${day}">${value ? "✅" : ""}</div>
+    function loadAnswers() {
+      const container = document.getElementById("doors");
+      container.innerHTML = "";
+      db.collection("answers").doc(currentUser).get().then(doc => {
+        const data = doc.exists ? doc.data() : {};
+        let answered = 0;
+        for (let i = 1; i <= 24; i++) {
+          const key = "tag" + i;
+          const val = data[key] || "";
+          if (val) answered++;
+          const div = document.createElement("div");
+          div.className = "door";
+          div.innerHTML = `
+            <h3>Türchen ${i}</h3>
+            <input id="input${i}" value="${val}" placeholder="Antwort eingeben">
+            <button onclick="saveAnswer(${i})">Speichern</button>
+            <div id="status${i}">${val ? "✅" : ""}</div>
           `;
-          doorsDiv.appendChild(door);
+          container.appendChild(div);
         }
-
-        document.getElementById("progress").innerText = \`Du hast \${answeredCount}/24 Türchen beantwortet.\`;
+        document.getElementById("progress").innerText = \`Beantwortet: \${answered}/24\`;
       });
     }
 
-    function submitAnswer(day) {
-      const user = auth.currentUser;
-      if (!user) return;
-      const val = document.getElementById("answer" + day).value.trim();
-      const key = "tag" + day;
-      db.collection("adventkalender").doc(user.uid)
-        .set({ [key]: val }, { merge: true })
+    function saveAnswer(i) {
+      const val = document.getElementById("input" + i).value.trim();
+      if (!val) return;
+      const key = "tag" + i;
+      db.collection("answers").doc(currentUser).set({ [key]: val }, { merge: true })
         .then(() => {
-          const status = document.getElementById("status" + day);
-          if (correctAnswers[key] && correctAnswers[key].toLowerCase() === val.toLowerCase()) {
-            status.innerText = "✅ Richtig!";
-          } else if (correctAnswers[key]) {
-            status.innerText = "❌ Falsch!";
-          } else {
-            status.innerText = "✅ Gespeichert!";
-          }
-          loadAnswers(user.uid);
+          document.getElementById("status" + i).innerText = "✅";
+          loadAnswers();
         });
     }
   </script>
