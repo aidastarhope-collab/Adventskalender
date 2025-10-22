@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adventskalender - Slide Up</title>
+  <title>Adventskalender - Doppeltür</title>
   
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
@@ -138,16 +138,15 @@
     #doors {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 15px;
+      gap: 30px;
       margin-top: 30px;
     }
     
-    /* Slide Container */
+    /* Double Door Container */
     .door-container {
       position: relative;
       height: 280px;
-      overflow: hidden;
-      border-radius: 12px;
+      perspective: 1000px;
     }
     
     .door-content {
@@ -155,12 +154,12 @@
       width: 100%;
       height: 100%;
       background: #8b0000;
+      border-radius: 12px;
       padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       border: 3px solid #660000;
-      border-radius: 12px;
     }
     
     .door-content h3 {
@@ -209,56 +208,75 @@
       font-size: 1.3em;
     }
     
-    /* Door Front (slides up) */
-    .door-front {
+    /* Double Doors */
+    .door-left, .door-right {
       position: absolute;
-      width: 100%;
+      top: 0;
+      width: 50%;
       height: 100%;
       background: #dc143c;
+      border: 3px solid #b22222;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      border: 3px solid #b22222;
-      border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transition: transform 0.6s ease-in-out;
-      z-index: 2;
     }
     
-    .door-container.open .door-front {
-      transform: translateY(-100%);
+    .door-left {
+      left: 0;
+      border-radius: 12px 0 0 12px;
+      transform-origin: left;
     }
     
-    .door-front:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    .door-right {
+      right: 0;
+      border-radius: 0 12px 12px 0;
+      transform-origin: right;
     }
     
-    .door-container.open .door-front:hover {
-      transform: translateY(-100%);
+    .door-container.open .door-left {
+      transform: rotateY(-120deg);
     }
     
-    .door-front h3 {
+    .door-container.open .door-right {
+      transform: rotateY(120deg);
+    }
+    
+    .door-number {
       color: white;
-      font-size: 2em;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-      margin-bottom: 10px;
-    }
-    
-    .door-front .number {
-      color: white;
-      font-size: 3.5em;
+      font-size: 3em;
       font-weight: bold;
-      text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      pointer-events: none;
     }
     
-    .door-front .status-icon {
+    .door-left .door-number {
+      margin-left: 20px;
+    }
+    
+    .door-right .door-number {
+      margin-right: 20px;
+    }
+    
+    .status-icon {
       position: absolute;
       top: 10px;
+      font-size: 1.5em;
+    }
+    
+    .door-left .status-icon {
       right: 10px;
-      font-size: 1.8em;
+    }
+    
+    .door-right .status-icon {
+      left: 10px;
+    }
+    
+    .door-left:hover, .door-right:hover {
+      filter: brightness(1.1);
     }
     
     /* Responsive */
@@ -271,7 +289,7 @@
     @media (max-width: 700px) {
       #doors {
         grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
+        gap: 20px;
       }
       
       .door-container {
@@ -399,10 +417,12 @@
                 <button class="close-btn" onclick="toggleDoor(${i})">Schließen</button>
                 <div class="status" id="status${i}"></div>
               </div>
-              <div class="door-front" onclick="toggleDoor(${i})">
+              <div class="door-left" onclick="toggleDoor(${i})">
                 <span class="status-icon">${val ? "✅" : ""}</span>
-                <div class="number">${i}</div>
-                <h3>🎁</h3>
+                <div class="door-number">${i}</div>
+              </div>
+              <div class="door-right" onclick="toggleDoor(${i})">
+                <div class="door-number">🎁</div>
               </div>
             `;
             
