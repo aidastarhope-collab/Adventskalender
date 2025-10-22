@@ -275,7 +275,7 @@
         return;
       }
 
-      db.collection("user").doc(name).get()
+      db.collection("users").doc(name).get()
         .then(doc => {
           console.log("Doc exists:", doc.exists);
           console.log("Doc data:", doc.data());
