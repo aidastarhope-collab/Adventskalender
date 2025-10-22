@@ -18,7 +18,7 @@
     
     body { 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #2e0a0a;
+      background: crimson;
       padding: 20px;
       min-height: 100vh;
     }
@@ -33,7 +33,7 @@
       color: white;
       font-size: 3em;
       margin-bottom: 30px;
-      text-shadow: 2px 2px 4px rgba(57,8,8,1);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
     
     .hidden { 
@@ -47,11 +47,11 @@
       margin: 50px auto;
       padding: 40px;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(57,8,8,1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
     
     #login h2 {
-      color: #2e0a0a;
+      color: crimson;
       margin-bottom: 20px;
       text-align: center;
     }
@@ -67,13 +67,13 @@
     
     #login input:focus {
       outline: none;
-      border-color: #2e0a0a;
+      border-color: crimson;
     }
     
     #login button {
       width: 100%;
       padding: 12px;
-      background: #2e0a0a;
+      background: crimson;
       color: white;
       border: none;
       border-radius: 8px;
@@ -85,11 +85,11 @@
     }
     
     #login button:hover {
-      background: #2e0a0a;
+      background: #b22222;
     }
     
     #login-msg {
-      color: #2e0a0a;
+      color: crimson;
       margin-top: 15px;
       text-align: center;
       font-weight: bold;
@@ -122,7 +122,7 @@
     .logout-btn {
       padding: 10px 30px;
       background: white;
-      color: #2e0a0a;
+      color: crimson;
       border: none;
       border-radius: 8px;
       cursor: pointer;
@@ -145,21 +145,83 @@
       margin-top: 30px;
     }
     
-    .door { 
-      background: #440b17;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transition: transform 0.3s, box-shadow 0.3s;
-      border: 3px solid #442a2a;
+    /* Door Container with 3D perspective */
+    .door-container {
+      perspective: 1000px;
+      height: 280px;
     }
     
-    .door:hover {
-      transform: translateY(-5px);
+    .door-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    
+    .door-container.open .door-inner {
+      transform: rotateY(180deg);
+    }
+    
+    .door-front, .door-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+    }
+    
+    /* Door Front (closed) */
+    .door-front {
+      background: #dc143c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 3px solid #b22222;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .door-front:hover {
+      transform: scale(1.05);
       box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
     
-    .door h3 {
+    .door-front h3 {
+      color: white;
+      font-size: 2em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    
+    .door-front .number {
+      color: white;
+      font-size: 3em;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .door-front .status-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.5em;
+    }
+    
+    /* Door Back (opened) */
+    .door-back {
+      background: #8b0000;
+      transform: rotateY(180deg);
+      padding: 20px;
+      border: 3px solid #660000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .door-back h3 {
       color: white;
       margin-bottom: 15px;
       font-size: 1.3em;
@@ -167,7 +229,7 @@
       text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     }
     
-    .door input {
+    .door-back input {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
@@ -176,7 +238,7 @@
       font-size: 14px;
     }
     
-    .door button {
+    .door-back button {
       width: 100%;
       padding: 10px;
       background: white;
@@ -186,16 +248,27 @@
       cursor: pointer;
       font-weight: bold;
       transition: all 0.3s;
+      margin-bottom: 10px;
     }
     
-    .door button:hover {
+    .door-back button:hover {
       background: #ffe4e1;
       transform: scale(1.05);
     }
     
-    .door .status {
+    .door-back .close-btn {
+      background: transparent;
+      border: 2px solid white;
+      color: white;
+    }
+    
+    .door-back .close-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .door-back .status {
       text-align: center;
-      margin-top: 10px;
+      margin-top: 5px;
       font-size: 1.5em;
     }
     
@@ -212,8 +285,8 @@
         gap: 10px;
       }
       
-      .door {
-        padding: 15px;
+      .door-container {
+        height: 250px;
       }
       
       h1 {
@@ -224,6 +297,10 @@
     @media (max-width: 500px) {
       #doors {
         grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .door-container {
+        height: 220px;
       }
     }
   </style>
@@ -242,7 +319,7 @@
 
     <div id="calendar" class="hidden">
       <div class="welcome-section">
-        <h2>Willkommen, <span id="userLabel"></span>! </h2>
+        <h2>Willkommen, <span id="userLabel"></span>! 🎅</h2>
         <p id="progress"></p>
         <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
@@ -277,9 +354,6 @@
 
       db.collection("users").doc(name).get()
         .then(doc => {
-          console.log("Doc exists:", doc.exists);
-          console.log("Doc data:", doc.data());
-          
           if (!doc.exists) {
             document.getElementById("login-msg").innerText = "Benutzer nicht gefunden.";
             return;
@@ -311,6 +385,11 @@
       document.getElementById("password").value = "";
     }
 
+    function toggleDoor(i) {
+      const container = document.getElementById("door-container-" + i);
+      container.classList.toggle("open");
+    }
+
     function loadAnswers() {
       const container = document.getElementById("doors");
       container.innerHTML = "";
@@ -325,15 +404,28 @@
             const val = data[key] || "";
             if (val) answered++;
             
-            const div = document.createElement("div");
-            div.className = "door";
-            div.innerHTML = `
-              <h3>Türchen ${i}</h3>
-              <input id="input${i}" value="${val}" placeholder="Antwort">
-              <button onclick="saveAnswer(${i})">Speichern</button>
-              <div class="status" id="status${i}">${val ? "✅" : ""}</div>
+            const doorContainer = document.createElement("div");
+            doorContainer.className = "door-container";
+            doorContainer.id = "door-container-" + i;
+            
+            doorContainer.innerHTML = `
+              <div class="door-inner">
+                <div class="door-front" onclick="toggleDoor(${i})">
+                  <span class="status-icon">${val ? "✅" : ""}</span>
+                  <div class="number">${i}</div>
+                  <h3>🎁</h3>
+                </div>
+                <div class="door-back">
+                  <h3>Türchen ${i}</h3>
+                  <input id="input${i}" value="${val}" placeholder="Deine Antwort">
+                  <button onclick="saveAnswer(${i})">Speichern</button>
+                  <button class="close-btn" onclick="toggleDoor(${i})">Schließen</button>
+                  <div class="status" id="status${i}"></div>
+                </div>
+              </div>
             `;
-            container.appendChild(div);
+            
+            container.appendChild(doorContainer);
           }
           
           document.getElementById("progress").innerText = `Beantwortet: ${answered}/24 🎁`;
@@ -350,8 +442,11 @@
       const key = "tag" + i;
       db.collection("answers").doc(currentUser).set({ [key]: val }, { merge: true })
         .then(() => {
-          document.getElementById("status" + i).innerText = "✅";
-          loadAnswers();
+          document.getElementById("status" + i).innerText = "✅ Gespeichert!";
+          setTimeout(() => {
+            toggleDoor(i);
+            setTimeout(() => loadAnswers(), 600);
+          }, 1000);
         })
         .catch(error => {
           console.error("Fehler beim Speichern:", error);
