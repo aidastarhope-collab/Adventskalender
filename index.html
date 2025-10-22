@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adventskalender Login</title>
+  <title>Adventskalender - Doppeltür</title>
   
-  <!-- Firebase App (compat version) -->
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
   
@@ -18,7 +17,7 @@
     
     body { 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #360e0e;
+      background: crimson;
       padding: 20px;
       min-height: 100vh;
     }
@@ -36,9 +35,7 @@
       text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
     
-    .hidden { 
-      display: none; 
-    }
+    .hidden { display: none; }
     
     /* Login Styles */
     #login {
@@ -51,7 +48,7 @@
     }
     
     #login h2 {
-      color: #360e0e;
+      color: crimson;
       margin-bottom: 20px;
       text-align: center;
     }
@@ -67,13 +64,13 @@
     
     #login input:focus {
       outline: none;
-      border-color: #360e0e;
+      border-color: crimson;
     }
     
     #login button {
       width: 100%;
       padding: 12px;
-      background: #360e0e;
+      background: crimson;
       color: white;
       border: none;
       border-radius: 8px;
@@ -89,7 +86,7 @@
     }
     
     #login-msg {
-      color: #360e0e;
+      color: crimson;
       margin-top: 15px;
       text-align: center;
       font-weight: bold;
@@ -122,7 +119,7 @@
     .logout-btn {
       padding: 10px 30px;
       background: white;
-      color: #360e0e;
+      color: crimson;
       border: none;
       border-radius: 8px;
       cursor: pointer;
@@ -145,91 +142,34 @@
       margin-top: 30px;
     }
     
-    /* Door Container with 3D perspective */
+    /* Double Door Container */
     .door-container {
-      perspective: 1000px;
-      height: 280px;
-    }
-    
-    .door-inner {
       position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s;
-      transform-style: preserve-3d;
+      height: 280px;
+      perspective: 1000px;
     }
     
-    .door-container.open .door-inner {
-      transform: rotateY(180deg);
-    }
-    
-    .door-front, .door-back {
+    .door-content {
       position: absolute;
       width: 100%;
       height: 100%;
-      backface-visibility: hidden;
-      border-radius: 12px;
-    }
-    
-    /* Door Front (closed) */
-    .door-front {
-      background: #dc143c;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      border: 3px solid #b22222;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .door-front:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
-    
-    .door-front h3 {
-      color: white;
-      font-size: 2em;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-      margin-bottom: 10px;
-    }
-    
-    .door-front .number {
-      color: white;
-      font-size: 3em;
-      font-weight: bold;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-    
-    .door-front .status-icon {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 1.5em;
-    }
-    
-    /* Door Back (opened) */
-    .door-back {
       background: #8b0000;
-      transform: rotateY(180deg);
+      border-radius: 12px;
       padding: 20px;
-      border: 3px solid #660000;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      border: 3px solid #660000;
     }
     
-    .door-back h3 {
+    .door-content h3 {
       color: white;
       margin-bottom: 15px;
       font-size: 1.3em;
       text-align: center;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     }
     
-    .door-back input {
+    .door-content input {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
@@ -238,38 +178,105 @@
       font-size: 14px;
     }
     
-    .door-back button {
+    .door-content button {
       width: 100%;
       padding: 10px;
       background: white;
-      color: #360e0e;
+      color: crimson;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
       transition: all 0.3s;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     
-    .door-back button:hover {
+    .door-content button:hover {
       background: #ffe4e1;
       transform: scale(1.05);
     }
     
-    .door-back .close-btn {
+    .door-content .close-btn {
       background: transparent;
       border: 2px solid white;
       color: white;
     }
     
-    .door-back .close-btn:hover {
-      background: rgba(255,255,255,0.1);
-    }
-    
-    .door-back .status {
+    .door-content .status {
       text-align: center;
       margin-top: 5px;
+      font-size: 1.3em;
+    }
+    
+    /* Double Doors */
+    .door-left, .door-right {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: #dc143c;
+      border: 3px solid #b22222;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .door-left {
+      left: 0;
+      border-radius: 12px 0 0 12px;
+      transform-origin: left;
+    }
+    
+    .door-right {
+      right: 0;
+      border-radius: 0 12px 12px 0;
+      transform-origin: right;
+    }
+    
+    .door-container.open .door-left {
+      transform: rotateY(-120deg);
+    }
+    
+    .door-container.open .door-right {
+      transform: rotateY(120deg);
+    }
+    
+    .door-number {
+      color: white;
+      font-size: 3em;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      pointer-events: none;
+    }
+    
+    .door-left .door-number {
+      margin-left: 20px;
+    }
+    
+    .door-right .door-number {
+      margin-right: 20px;
+    }
+    
+    .status-icon {
+      position: absolute;
+      top: 10px;
       font-size: 1.5em;
+    }
+    
+    .door-left .status-icon {
+      right: 10px;
+    }
+    
+    .door-right .status-icon {
+      left: 10px;
+    }
+    
+    .door-left:hover, .door-right:hover {
+      filter: brightness(1.1);
     }
     
     /* Responsive */
@@ -298,10 +305,6 @@
       #doors {
         grid-template-columns: repeat(2, 1fr);
       }
-      
-      .door-container {
-        height: 220px;
-      }
     }
   </style>
 </head>
@@ -328,7 +331,6 @@
   </div>
 
   <script>
-    // Firebase initialisieren
     const firebaseConfig = {
       apiKey: "AIzaSyC1QIEr0IjLVQx-WlYYG1iRo08LmyuqWXY",
       authDomain: "cg-adventskalender.firebaseapp.com",
@@ -363,7 +365,6 @@
             return;
           }
           
-          // Login erfolgreich
           currentUser = name;
           document.getElementById("userLabel").innerText = name;
           document.getElementById("login").classList.add("hidden");
@@ -409,19 +410,19 @@
             doorContainer.id = "door-container-" + i;
             
             doorContainer.innerHTML = `
-              <div class="door-inner">
-                <div class="door-front" onclick="toggleDoor(${i})">
-                  <span class="status-icon">${val ? "✅" : ""}</span>
-                  <div class="number">${i}</div>
-                  <h3>🎁</h3>
-                </div>
-                <div class="door-back">
-                  <h3>Türchen ${i}</h3>
-                  <input id="input${i}" value="${val}" placeholder="Deine Antwort">
-                  <button onclick="saveAnswer(${i})">Speichern</button>
-                  <button class="close-btn" onclick="toggleDoor(${i})">Schließen</button>
-                  <div class="status" id="status${i}"></div>
-                </div>
+              <div class="door-content">
+                <h3>Türchen ${i}</h3>
+                <input id="input${i}" value="${val}" placeholder="Deine Antwort">
+                <button onclick="saveAnswer(${i})">Speichern</button>
+                <button class="close-btn" onclick="toggleDoor(${i})">Schließen</button>
+                <div class="status" id="status${i}"></div>
+              </div>
+              <div class="door-left" onclick="toggleDoor(${i})">
+                <span class="status-icon">${val ? "✅" : ""}</span>
+                <div class="door-number">${i}</div>
+              </div>
+              <div class="door-right" onclick="toggleDoor(${i})">
+                <div class="door-number">🎁</div>
               </div>
             `;
             
