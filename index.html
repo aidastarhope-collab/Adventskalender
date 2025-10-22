@@ -10,69 +10,244 @@
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
   
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body { 
-      font-family: sans-serif; 
-      background: #f0f0f0; 
-      padding: 20px; 
-      max-width: 800px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: crimson;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
       margin: 0 auto;
     }
-    .hidden { display: none; }
-    .door { 
-      background: #fff; 
-      padding: 15px; 
-      margin-bottom: 10px; 
-      border-radius: 8px; 
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    h1 {
+      text-align: center;
+      color: white;
+      font-size: 3em;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
-    .door h3 {
-      margin-top: 0;
-      color: #c41e3a;
+    
+    .hidden { 
+      display: none; 
     }
-    input {
-      padding: 8px;
-      margin: 5px 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      width: 200px;
+    
+    /* Login Styles */
+    #login {
+      background: white;
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
-    button {
-      padding: 8px 16px;
-      background: #c41e3a;
+    
+    #login h2 {
+      color: crimson;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    #login input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    
+    #login input:focus {
+      outline: none;
+      border-color: crimson;
+    }
+    
+    #login button {
+      width: 100%;
+      padding: 12px;
+      background: crimson;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
-      margin: 5px 0;
-    }
-    button:hover {
-      background: #a01729;
-    }
-    #login-msg {
-      color: red;
-      margin-top: 10px;
-    }
-    #progress {
+      font-size: 18px;
       font-weight: bold;
-      color: #2d5016;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+    
+    #login button:hover {
+      background: #b22222;
+    }
+    
+    #login-msg {
+      color: crimson;
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+    
+    /* Calendar Styles */
+    #calendar {
+      color: white;
+    }
+    
+    .welcome-section {
+      text-align: center;
+      margin-bottom: 30px;
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 15px;
+    }
+    
+    .welcome-section h2 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    
+    #progress {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #ffe4e1;
+    }
+    
+    .logout-btn {
+      padding: 10px 30px;
+      background: white;
+      color: crimson;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 15px;
+      transition: all 0.3s;
+    }
+    
+    .logout-btn:hover {
+      background: #ffe4e1;
+      transform: scale(1.05);
+    }
+    
+    /* Door Grid */
+    #doors {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 15px;
+      margin-top: 30px;
+    }
+    
+    .door { 
+      background: #dc143c;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 3px solid #b22222;
+    }
+    
+    .door:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+    
+    .door h3 {
+      color: white;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+      text-align: center;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .door input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 2px solid white;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .door button {
+      width: 100%;
+      padding: 10px;
+      background: white;
+      color: crimson;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .door button:hover {
+      background: #ffe4e1;
+      transform: scale(1.05);
+    }
+    
+    .door .status {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1.5em;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1000px) {
+      #doors {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    
+    @media (max-width: 700px) {
+      #doors {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      
+      .door {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 2em;
+      }
+    }
+    
+    @media (max-width: 500px) {
+      #doors {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
 <body>
-  <h1>🎄 Adventskalender</h1>
-  
-  <div id="login">
-    <input id="username" placeholder="Benutzername"><br>
-    <input id="password" placeholder="Passwort" type="password"><br>
-    <button onclick="login()">Login</button>
-    <div id="login-msg"></div>
-  </div>
+  <div class="container">
+    <h1>🎄 Adventskalender 🎄</h1>
+    
+    <div id="login">
+      <h2>Login</h2>
+      <input id="username" placeholder="Benutzername">
+      <input id="password" placeholder="Passwort" type="password">
+      <button onclick="login()">Einloggen</button>
+      <div id="login-msg"></div>
+    </div>
 
-  <div id="calendar" class="hidden">
-    <h2>Willkommen, <span id="userLabel"></span>!</h2>
-    <p id="progress"></p>
-    <div id="doors"></div>
-    <button onclick="logout()">Logout</button>
+    <div id="calendar" class="hidden">
+      <div class="welcome-section">
+        <h2>Willkommen, <span id="userLabel"></span>! 🎅</h2>
+        <p id="progress"></p>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+      <div id="doors"></div>
+    </div>
   </div>
 
   <script>
@@ -100,8 +275,11 @@
         return;
       }
 
-      db.collection("users").doc(name).get()
+      db.collection("user").doc(name).get()
         .then(doc => {
+          console.log("Doc exists:", doc.exists);
+          console.log("Doc data:", doc.data());
+          
           if (!doc.exists) {
             document.getElementById("login-msg").innerText = "Benutzer nicht gefunden.";
             return;
@@ -151,14 +329,14 @@
             div.className = "door";
             div.innerHTML = `
               <h3>Türchen ${i}</h3>
-              <input id="input${i}" value="${val}" placeholder="Antwort eingeben">
+              <input id="input${i}" value="${val}" placeholder="Antwort">
               <button onclick="saveAnswer(${i})">Speichern</button>
-              <span id="status${i}">${val ? " ✅" : ""}</span>
+              <div class="status" id="status${i}">${val ? "✅" : ""}</div>
             `;
             container.appendChild(div);
           }
           
-          document.getElementById("progress").innerText = `Beantwortet: ${answered}/24`;
+          document.getElementById("progress").innerText = `Beantwortet: ${answered}/24 🎁`;
         })
         .catch(error => {
           console.error("Fehler beim Laden:", error);
@@ -172,7 +350,7 @@
       const key = "tag" + i;
       db.collection("answers").doc(currentUser).set({ [key]: val }, { merge: true })
         .then(() => {
-          document.getElementById("status" + i).innerText = " ✅";
+          document.getElementById("status" + i).innerText = "✅";
           loadAnswers();
         })
         .catch(error => {
