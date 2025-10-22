@@ -138,7 +138,7 @@
     #doors {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 30px;
+      gap: 50px;
       margin-top: 30px;
     }
     
@@ -261,20 +261,6 @@
       margin-right: 20px;
     }
     
-    .status-icon {
-      position: absolute;
-      top: 10px;
-      font-size: 1.5em;
-    }
-    
-    .door-left .status-icon {
-      right: 10px;
-    }
-    
-    .door-right .status-icon {
-      left: 10px;
-    }
-    
     .door-left:hover, .door-right:hover {
       filter: brightness(1.1);
     }
@@ -283,13 +269,14 @@
     @media (max-width: 1000px) {
       #doors {
         grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
       }
     }
     
     @media (max-width: 700px) {
       #doors {
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        gap: 30px;
       }
       
       .door-container {
@@ -418,7 +405,6 @@
                 <div class="status" id="status${i}"></div>
               </div>
               <div class="door-left" onclick="toggleDoor(${i})">
-                <span class="status-icon">${val ? "✅" : ""}</span>
                 <div class="door-number">${i}</div>
               </div>
               <div class="door-right" onclick="toggleDoor(${i})">
