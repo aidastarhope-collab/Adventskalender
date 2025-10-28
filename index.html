@@ -138,7 +138,7 @@
     #doors {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 80px;
+      gap: 120px;
       margin-top: 30px;
     }
     
@@ -251,6 +251,11 @@
       font-weight: bold;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
       pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .door-container.open .door-number {
+      opacity: 0;
     }
     
     .door-left .door-number {
@@ -269,14 +274,14 @@
     @media (max-width: 1000px) {
       #doors {
         grid-template-columns: repeat(3, 1fr);
-        gap: 60px;
+        gap: 90px;
       }
     }
     
     @media (max-width: 700px) {
       #doors {
         grid-template-columns: repeat(2, 1fr);
-        gap: 50px;
+        gap: 70px;
       }
       
       .door-container {
