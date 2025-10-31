@@ -278,12 +278,6 @@
       transform: translate(-50%, -50%);
       z-index: 10;
       pointer-events: none;
-      transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    
-    .door-container.opening .bow-container {
-      transform: translate(-50%, -50%) scale(0) rotate(180deg);
-      opacity: 0;
     }
     
     .door-container.open .bow-container {
@@ -307,6 +301,12 @@
       left: -5px;
       top: 10px;
       transform: rotate(-45deg);
+      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .door-container.opening .bow-left {
+      transform: rotate(-45deg) translateX(-60px) scale(0.3);
+      opacity: 0;
     }
     
     /* Bow Right Loop */
@@ -319,6 +319,12 @@
       right: -5px;
       top: 10px;
       transform: rotate(45deg);
+      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .door-container.opening .bow-right {
+      transform: rotate(45deg) translateX(60px) scale(0.3);
+      opacity: 0;
     }
     
     /* Bow Center Knot */
@@ -332,6 +338,12 @@
       top: 50%;
       transform: translate(-50%, -50%);
       z-index: 2;
+      transition: all 0.6s ease-out;
+    }
+    
+    .door-container.opening .bow-knot {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
     }
     
     /* Bow Ribbons */
@@ -341,17 +353,29 @@
       height: 50px;
       background: linear-gradient(to bottom, #FFD700, #FFA500);
       left: 50%;
-      transform: translateX(-50%);
+      transition: all 0.6s ease-out;
     }
     
     .bow-ribbon.left {
       top: 55px;
       transform: translateX(-50%) rotate(-15deg);
+      transform-origin: top center;
+    }
+    
+    .door-container.opening .bow-ribbon.left {
+      transform: translateX(-50%) rotate(-15deg) translateY(80px);
+      opacity: 0;
     }
     
     .bow-ribbon.right {
       top: 55px;
       transform: translateX(-50%) rotate(15deg);
+      transform-origin: top center;
+    }
+    
+    .door-container.opening .bow-ribbon.right {
+      transform: translateX(-50%) rotate(15deg) translateY(80px);
+      opacity: 0;
     }
     
     /* Ribbon ends */
@@ -381,6 +405,11 @@
       right: -10px;
       font-size: 20px;
       animation: sparkle 1.5s infinite;
+      transition: opacity 0.3s;
+    }
+    
+    .door-container.opening .bow::before {
+      opacity: 0;
     }
     
     /* Responsive */
@@ -509,11 +538,11 @@
         container.classList.remove("open");
         container.classList.remove("opening");
       } else {
-        // Öffnen: Erst Schleife animieren, dann Türen
+        // Öffnen: Erst Schleife aufziehen, dann Türen öffnen
         container.classList.add("opening");
         setTimeout(() => {
           container.classList.add("open");
-        }, 400); // Schleife verschwindet nach 400ms, dann öffnen sich die Türen
+        }, 600); // Schleife löst sich in 600ms, dann öffnen sich die Türen
       }
     }
 
