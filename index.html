@@ -192,7 +192,7 @@
     }
     
     .door-content button:hover {
-      background: #4c0513;
+      background: #ffe4e1;
       transform: scale(1.05);
     }
     
@@ -216,7 +216,7 @@
       height: 100%;
       background: #5e001b;
       border: 3px solid #692230;
-      transition: transform 1s;
+      transition: transform 1s ease-in-out;
       transform-style: preserve-3d;
       cursor: pointer;
       display: flex;
@@ -270,6 +270,119 @@
       filter: brightness(1.1);
     }
     
+    /* Bow (Schleife) Animation */
+    .bow-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      pointer-events: none;
+      transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .door-container.opening .bow-container {
+      transform: translate(-50%, -50%) scale(0) rotate(180deg);
+      opacity: 0;
+    }
+    
+    .door-container.open .bow-container {
+      display: none;
+    }
+    
+    .bow {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+    
+    /* Bow Left Loop */
+    .bow-left {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: #FFD700;
+      border-radius: 50% 0 50% 0;
+      left: -5px;
+      top: 10px;
+      transform: rotate(-45deg);
+    }
+    
+    /* Bow Right Loop */
+    .bow-right {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: #FFD700;
+      border-radius: 0 50% 0 50%;
+      right: -5px;
+      top: 10px;
+      transform: rotate(45deg);
+    }
+    
+    /* Bow Center Knot */
+    .bow-knot {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #FFA500;
+      border-radius: 50%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+    
+    /* Bow Ribbons */
+    .bow-ribbon {
+      position: absolute;
+      width: 8px;
+      height: 50px;
+      background: linear-gradient(to bottom, #FFD700, #FFA500);
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    .bow-ribbon.left {
+      top: 55px;
+      transform: translateX(-50%) rotate(-15deg);
+    }
+    
+    .bow-ribbon.right {
+      top: 55px;
+      transform: translateX(-50%) rotate(15deg);
+    }
+    
+    /* Ribbon ends */
+    .bow-ribbon::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 10px solid #FFA500;
+    }
+    
+    /* Add sparkle effect */
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.2); }
+    }
+    
+    .bow::before {
+      content: '✨';
+      position: absolute;
+      top: -15px;
+      right: -10px;
+      font-size: 20px;
+      animation: sparkle 1.5s infinite;
+    }
+    
     /* Responsive */
     @media (max-width: 1000px) {
       #doors {
@@ -291,6 +404,16 @@
       h1 {
         font-size: 2em;
       }
+      
+      .bow {
+        width: 60px;
+        height: 60px;
+      }
+      
+      .bow-left, .bow-right {
+        width: 30px;
+        height: 30px;
+      }
     }
     
     @media (max-width: 500px) {
@@ -302,7 +425,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>CG Adventskalender </h1>
+    <h1>🎄 CG Adventskalender 🎄</h1>
     
     <div id="login">
       <h2>Login</h2>
@@ -380,7 +503,18 @@
 
     function toggleDoor(i) {
       const container = document.getElementById("door-container-" + i);
-      container.classList.toggle("open");
+      
+      if (container.classList.contains("open")) {
+        // Schließen
+        container.classList.remove("open");
+        container.classList.remove("opening");
+      } else {
+        // Öffnen: Erst Schleife animieren, dann Türen
+        container.classList.add("opening");
+        setTimeout(() => {
+          container.classList.add("open");
+        }, 400); // Schleife verschwindet nach 400ms, dann öffnen sich die Türen
+      }
     }
 
     function loadAnswers() {
@@ -408,6 +542,15 @@
                 <button onclick="saveAnswer(${i})">Speichern</button>
                 <button class="close-btn" onclick="toggleDoor(${i})">Schließen</button>
                 <div class="status" id="status${i}"></div>
+              </div>
+              <div class="bow-container">
+                <div class="bow">
+                  <div class="bow-left"></div>
+                  <div class="bow-right"></div>
+                  <div class="bow-knot"></div>
+                  <div class="bow-ribbon left"></div>
+                  <div class="bow-ribbon right"></div>
+                </div>
               </div>
               <div class="door-left" onclick="toggleDoor(${i})">
                 <div class="door-number">${i}</div>
