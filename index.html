@@ -149,6 +149,18 @@
       perspective: 1000px;
     }
     
+    /* Locked Door Styling */
+    .door-container.locked .door-left,
+    .door-container.locked .door-right {
+      cursor: not-allowed;
+      filter: brightness(0.6);
+    }
+    
+    .door-container.locked .door-left:hover,
+    .door-container.locked .door-right:hover {
+      filter: brightness(0.6);
+    }
+    
     .door-content {
       position: absolute;
       width: 100%;
@@ -216,7 +228,7 @@
       height: 100%;
       background: #5e001b;
       border: 3px solid #692230;
-      transition: transform 1s ease-in-out 0.5s;
+      transition: transform 1s ease-in-out;
       transform-style: preserve-3d;
       cursor: pointer;
       display: flex;
@@ -235,11 +247,6 @@
       right: 0;
       border-radius: 0 12px 12px 0;
       transform-origin: right;
-    }
-    
-    .door-container.opening .door-left,
-    .door-container.opening .door-right {
-      transition: transform 1s ease-in-out 0.5s;
     }
     
     .door-container.open .door-left {
@@ -275,198 +282,95 @@
       filter: brightness(1.1);
     }
     
-    /* Bow Container */
-    .bow-container {
+    /* Lock Icon */
+    .lock-container {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 10;
       pointer-events: none;
-      width: 100px;
-      height: 120px;
+      transition: all 0.6s ease-out;
     }
     
-    .door-container.open .bow-container {
+    .door-container.unlocking .lock-container {
+      animation: lockFall 0.8s ease-in forwards;
+    }
+    
+    @keyframes lockFall {
+      0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+        opacity: 1;
+      }
+      70% {
+        transform: translate(-50%, 100px) rotate(180deg);
+        opacity: 0.5;
+      }
+      100% {
+        transform: translate(-50%, 150px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    .door-container:not(.locked) .lock-container {
       display: none;
     }
     
-    /* Vertical Ribbon (durchgehend über die Tür) */
-    .ribbon-vertical {
+    .lock-icon {
+      width: 60px;
+      height: 70px;
+      position: relative;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    }
+    
+    /* Lock body */
+    .lock-body {
+      width: 60px;
+      height: 45px;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      border-radius: 8px;
       position: absolute;
-      width: 12px;
-      height: 100%;
-      background: linear-gradient(to right, #e8e8e8, white, #e8e8e8);
-      left: 50%;
-      top: -40%;
-      transform: translateX(-50%);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transition: all 0.7s ease-out;
+      bottom: 0;
+      box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2);
     }
     
-    .door-container.opening .ribbon-vertical {
-      height: 150%;
-      top: 60%;
-      opacity: 0;
-    }
-    
-    /* Bow - Schleife oben */
-    .bow {
+    /* Lock shackle */
+    .lock-shackle {
+      width: 30px;
+      height: 35px;
+      border: 8px solid #FFD700;
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
       position: absolute;
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 90px;
-      height: 60px;
-      transition: all 0.6s ease-out;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
     }
     
-    .door-container.opening .bow {
-      transform: translateX(-50%) translateY(-20px);
-      opacity: 0;
-    }
-    
-    /* Left Loop - Linke Schlaufe */
-    .bow-loop-left {
-      position: absolute;
-      width: 35px;
-      height: 35px;
-      background: white;
-      border-radius: 50% 50% 50% 5%;
-      left: 5px;
-      top: 15px;
-      transform: rotate(-45deg);
-      box-shadow: 
-        inset -2px -2px 5px rgba(0,0,0,0.1),
-        2px 2px 8px rgba(0,0,0,0.2);
-      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    
-    .door-container.opening .bow-loop-left {
-      transform: rotate(-45deg) translateX(-40px) translateY(-15px) rotate(-90deg) scale(0.5);
-      opacity: 0;
-    }
-    
-    /* Right Loop - Rechte Schlaufe */
-    .bow-loop-right {
-      position: absolute;
-      width: 35px;
-      height: 35px;
-      background: white;
-      border-radius: 50% 50% 5% 50%;
-      right: 5px;
-      top: 15px;
-      transform: rotate(45deg);
-      box-shadow: 
-        inset 2px -2px 5px rgba(0,0,0,0.1),
-        -2px 2px 8px rgba(0,0,0,0.2);
-      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    
-    .door-container.opening .bow-loop-right {
-      transform: rotate(45deg) translateX(40px) translateY(-15px) rotate(90deg) scale(0.5);
-      opacity: 0;
-    }
-    
-    /* Center Knot */
-    .bow-center {
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      background: radial-gradient(circle, white, #f0f0f0);
+    /* Keyhole */
+    .lock-keyhole {
+      width: 8px;
+      height: 8px;
+      background: #8B4513;
       border-radius: 50%;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 
-        0 2px 6px rgba(0,0,0,0.3),
-        inset 0 1px 2px rgba(255,255,255,0.8);
-      z-index: 2;
-      transition: all 0.4s ease-out;
-    }
-    
-    .door-container.opening .bow-center {
-      transform: translate(-50%, -50%) scale(0.3) translateY(30px);
-      opacity: 0;
-    }
-    
-    /* Ribbon Tails - Bänder unten */
-    .ribbon-tail {
       position: absolute;
-      width: 10px;
-      height: 45px;
-      background: linear-gradient(to bottom, white 0%, #f0f0f0 80%, #e0e0e0 100%);
-      top: 55px;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
-      transition: all 0.6s ease-out;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
     
-    .ribbon-tail.left {
-      left: 38%;
-      transform: rotate(-8deg);
-      transform-origin: top center;
-    }
-    
-    .ribbon-tail.right {
-      right: 38%;
-      transform: rotate(8deg);
-      transform-origin: top center;
-    }
-    
-    .door-container.opening .ribbon-tail.left {
-      transform: rotate(-8deg) translateY(80px) translateX(-10px) rotate(-25deg);
-      opacity: 0;
-    }
-    
-    .door-container.opening .ribbon-tail.right {
-      transform: rotate(8deg) translateY(80px) translateX(10px) rotate(25deg);
-      opacity: 0;
-    }
-    
-    /* V-cut at ribbon ends */
-    .ribbon-tail::after {
+    .lock-keyhole::after {
       content: '';
       position: absolute;
-      bottom: 0;
-      left: 0;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 5px solid #e0e0e0;
-      border-right: 5px solid #e0e0e0;
-      border-bottom: 8px solid transparent;
-    }
-    
-    /* Sparkle effect */
-    @keyframes sparkle {
-      0%, 100% { opacity: 0.8; transform: scale(1) rotate(0deg); }
-      50% { opacity: 1; transform: scale(1.3) rotate(180deg); }
-    }
-    
-    .sparkle {
-      position: absolute;
-      color: white;
-      font-size: 16px;
-      text-shadow: 0 0 10px rgba(255,255,255,0.8);
-      animation: sparkle 2s infinite;
-      pointer-events: none;
-    }
-    
-    .sparkle:nth-child(1) {
-      top: 5px;
-      right: 10px;
-      animation-delay: 0s;
-    }
-    
-    .sparkle:nth-child(2) {
-      top: 10px;
-      left: 5px;
-      animation-delay: 0.7s;
-      font-size: 12px;
-    }
-    
-    .door-container.opening .sparkle {
-      opacity: 0;
-      transition: opacity 0.3s;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 8px solid #8B4513;
     }
     
     /* Responsive */
@@ -491,14 +395,20 @@
         font-size: 2em;
       }
       
-      .bow {
-        width: 70px;
-        height: 50px;
+      .lock-icon {
+        width: 50px;
+        height: 60px;
       }
       
-      .bow-loop-left, .bow-loop-right {
-        width: 28px;
-        height: 28px;
+      .lock-body {
+        width: 50px;
+        height: 38px;
+      }
+      
+      .lock-shackle {
+        width: 25px;
+        height: 30px;
+        border-width: 6px;
       }
     }
     
@@ -546,6 +456,25 @@
 
     let currentUser = null;
 
+    // Check if door should be unlocked based on current date
+    function isDoorUnlocked(doorNumber) {
+      const now = new Date();
+      const currentDay = now.getDate();
+      const currentMonth = now.getMonth() + 1; // 0-indexed
+      
+      // Only unlock in December and only up to current day
+      if (currentMonth === 12 && doorNumber <= currentDay) {
+        return true;
+      }
+      
+      // For testing: unlock all doors in other months
+      if (currentMonth !== 12) {
+        return true;
+      }
+      
+      return false;
+    }
+
     function login() {
       const name = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
@@ -590,14 +519,19 @@
     function toggleDoor(i) {
       const container = document.getElementById("door-container-" + i);
       
+      // Check if door is locked
+      if (container.classList.contains("locked")) {
+        // Show message that door is still locked
+        alert("Dieses Türchen kann erst am " + i + ". Dezember geöffnet werden! 🎄");
+        return;
+      }
+      
       if (container.classList.contains("open")) {
+        // Close door
         container.classList.remove("open");
-        container.classList.remove("opening");
       } else {
-        container.classList.add("opening");
-        setTimeout(() => {
-          container.classList.add("open");
-        }, 50);
+        // Open door
+        container.classList.add("open");
       }
     }
 
@@ -619,6 +553,22 @@
             doorContainer.className = "door-container";
             doorContainer.id = "door-container-" + i;
             
+            const isUnlocked = isDoorUnlocked(i);
+            if (!isUnlocked) {
+              doorContainer.classList.add("locked");
+            }
+            
+            const lockHTML = !isUnlocked ? `
+              <div class="lock-container">
+                <div class="lock-icon">
+                  <div class="lock-shackle"></div>
+                  <div class="lock-body">
+                    <div class="lock-keyhole"></div>
+                  </div>
+                </div>
+              </div>
+            ` : '';
+            
             doorContainer.innerHTML = `
               <div class="door-content">
                 <h3>Türchen ${i}</h3>
@@ -627,18 +577,7 @@
                 <button class="close-btn" onclick="toggleDoor(${i})">Schließen</button>
                 <div class="status" id="status${i}"></div>
               </div>
-              <div class="bow-container">
-                <div class="ribbon-vertical"></div>
-                <div class="bow">
-                  <span class="sparkle">✨</span>
-                  <span class="sparkle">✨</span>
-                  <div class="bow-loop-left"></div>
-                  <div class="bow-loop-right"></div>
-                  <div class="bow-center"></div>
-                  <div class="ribbon-tail left"></div>
-                  <div class="ribbon-tail right"></div>
-                </div>
-              </div>
+              ${lockHTML}
               <div class="door-left" onclick="toggleDoor(${i})">
                 <div class="door-number">${i}</div>
               </div>
@@ -667,7 +606,7 @@
           document.getElementById("status" + i).innerText = "✅ Gespeichert!";
           setTimeout(() => {
             toggleDoor(i);
-            setTimeout(() => loadAnswers(), 1200);
+            setTimeout(() => loadAnswers(), 600);
           }, 1000);
         })
         .catch(error => {
