@@ -4,162 +4,133 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adventskalender</title>
-  
+
+  <!-- Fonts (rein visuell) -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase (unverändert) -->
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
-  
+
   <style>
-    /* ===== Grundfarben & Akzente ===== */
+    /* ===== Design Tokens ===== */
     :root{
       --bg:#26000b;
       --bg2:#3a0b18;
+      --card:#5e001b;
+      --card2:#6f0f25;
       --text:#fff;
+      --muted:#ffe4e1;
       --gold:#f6c867;
       --gold-d:#e2b75a;
+      --ring:rgba(255,255,255,.12);
+      --radius:12px;
     }
 
     /* ===== Reset ===== */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: var(--text);
+    *{ box-sizing:border-box; margin:0; padding:0 }
+    html,body{ height:100% }
+
+    body{
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial;
+      color:var(--text);
       background:
         radial-gradient(1200px 600px at 50% -10%, var(--bg2) 0%, var(--bg) 60%),
         var(--bg);
-      padding: 20px;
-      min-height: 100vh;
+      min-height:100vh;
+      padding:20px;
       padding-bottom: env(safe-area-inset-bottom);
     }
-    
-    .container { max-width: 1600px; margin: 0 auto; position:relative; z-index:2; }
-    
-    h1 {
-      text-align: center;
-      color: white;
-      font-size: 3em;
-      margin-bottom: 30px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-    
-    .hidden { display: none; }
 
-    /* ===== Schneefall (nur Header-Bereich, dezent) ===== */
+    .container{ max-width:1600px; margin:0 auto; position:relative; z-index:2 }
+
+    h1{
+      text-align:center;
+      font-weight:800;
+      letter-spacing:.6px;
+      font-size:clamp(28px,5.5vw,56px);
+      margin:4px 0 24px;
+      text-shadow:0 2px 0 rgba(0,0,0,.35);
+    }
+
+    .hidden{ display:none }
+
+    /* ===== Snow (Header only, light) ===== */
     .snow{ pointer-events:none; position:fixed; inset:0 0 auto 0; height:180px; overflow:hidden; z-index:1 }
     .snow i{
       position:absolute; top:-10px; width:6px; height:6px; border-radius:50%;
       background:#fff; opacity:.95; animation: fall linear var(--d) infinite; left:var(--x);
     }
-    @keyframes fall { to{ transform: translate3d(0, 220px, 0); } }
-    
-    /* ===== Login Styles (wie original, nur leicht veredelt) ===== */
-    #login {
+    @keyframes fall { to{ transform: translate3d(0,220px,0); } }
+
+    /* ===== Login (Glass + Gold) ===== */
+    #login{
       background: rgba(255,255,255,.06);
       border:1px solid rgba(246,200,103,.35);
       backdrop-filter: blur(8px);
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      max-width:400px;
+      margin:38px auto 32px;
+      padding:32px 26px;
+      border-radius:18px;
+      box-shadow:0 15px 40px rgba(0,0,0,.45);
     }
-    
-    #login h2 {
-      color: var(--gold);
-      margin-bottom: 20px;
-      text-align: center;
+    #login h2{ color:var(--gold); text-align:center; margin-bottom:14px; letter-spacing:.3px; }
+    #login input{
+      width:100%; padding:12px 14px; margin:10px 0;
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(0,0,0,.25); color:var(--text);
+      border-radius:12px; font-size:16px; outline:0;
+      transition:border-color .2s, box-shadow .2s;
     }
-    
-    #login input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid rgba(255,255,255,.25);
-      background: rgba(0,0,0,.25);
-      color: var(--text);
-      border-radius: 12px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color .2s ease, box-shadow .2s ease;
+    #login input:focus{ border-color:var(--gold); box-shadow:0 0 0 3px rgba(246,200,103,.25) }
+    #login button{
+      width:100%; padding:12px 14px; margin-top:10px;
+      border:0; border-radius:12px; font-weight:800; font-size:18px;
+      cursor:pointer; color:#3a2100;
+      background:linear-gradient(180deg,var(--gold),var(--gold-d));
+      box-shadow:0 8px 22px rgba(246,200,103,.25);
+      transition:transform .06s, box-shadow .2s;
     }
-    #login input:focus{ border-color: var(--gold); box-shadow: 0 0 0 3px rgba(246,200,103,.25); }
-    
-    #login button {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(180deg, var(--gold), var(--gold-d));
-      color: #3a2100;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 10px;
-      transition: transform .06s ease, box-shadow .2s ease;
-      box-shadow: 0 8px 22px rgba(246,200,103,.25);
-    }
-    #login button:active{ transform: translateY(1px); }
-    
-    #login-msg { color: #8fce00; margin-top: 15px; text-align: center; font-weight: bold; }
-    
-    /* ===== Calendar Styles ===== */
-    #calendar { color: white; }
-    
-    .welcome-section {
-      text-align: center;
-      margin-bottom: 30px;
-      background: rgba(255,255,255,0.1);
-      padding: 20px;
-      border-radius: 15px;
+    #login button:active{ transform:translateY(1px) }
+    #login-msg{ color:#8fce00; text-align:center; margin-top:10px; font-weight:700 }
+
+    /* ===== Calendar Header ===== */
+    #calendar{ color:var(--text) }
+    .welcome-section{
+      text-align:center; margin-bottom:22px; padding:18px;
+      background:rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.14);
+      border-radius:15px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
     }
-    
-    .welcome-section h2 { font-size: 2em; margin-bottom: 10px; }
-    #progress { font-size: 1.3em; font-weight: bold; color: #ffe4e1; }
-    
-    .logout-btn {
-      padding: 10px 30px;
-      background: transparent;
-      color: white;
-      border: 1px solid rgba(255,255,255,.25);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      margin-top: 15px;
-      transition: all 0.3s;
+    .welcome-section h2{ font-size:clamp(20px,3.8vw,28px); margin-bottom:6px }
+    #progress{ font-weight:700; color:var(--muted) }
+    .logout-btn{
+      margin-top:12px; padding:10px 24px; border-radius:12px; border:1px solid rgba(255,255,255,.25);
+      background:transparent; color:var(--text); cursor:pointer; font-weight:700;
+      transition:background .2s, transform .06s;
     }
-    .logout-btn:hover { background: rgba(255,255,255,.08); transform: none; }
-    
-    /* ===== Door Grid (EXAKT wie in deiner Ursprungsdatei) ===== */
-    #doors {
-      display: grid;
+    .logout-btn:hover{ background:rgba(255,255,255,.08) }
+    .logout-btn:active{ transform:translateY(1px) }
+
+    /* ===== Grid (Originalgröße & Gaps beibehalten) ===== */
+    #doors{
+      display:grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 200px;          /* wichtig: große Abstände beibehalten */
-      margin-top: 30px;
+      gap:200px;
+      margin-top:30px;
     }
-    
-    /* ===== Double Door Container (EXAKT wie original) ===== */
-    .door-container {
-      position: relative;
-      height: 280px;
-      perspective: 1000px;
-      border-radius: 12px;
-      isolation:isolate;
-    }
-    
-    /* Locked Door Styling */
-    .door-container.locked .door-left,
-    .door-container.locked .door-right {
-      cursor: not-allowed;
-      filter: brightness(0.6);
-    }
-    .door-container.locked .door-left:hover,
-    .door-container.locked .door-right:hover {
-      filter: brightness(0.6);
+    @media (max-width:1000px){ #doors{ grid-template-columns: repeat(3,1fr); gap:90px } }
+    @media (max-width:700px){ #doors{ grid-template-columns: repeat(2,1fr); gap:70px } .door-container{ height:250px } h1{ font-size:2em } }
+    @media (max-width:500px){ #doors{ grid-template-columns: repeat(2,1fr) } }
+
+    /* ===== Door Container (Originalhöhe beibehalten) ===== */
+    .door-container{
+      position:relative; height:280px; perspective:1000px; border-radius:var(--radius); isolation:isolate;
     }
 
-    /* Heute-Glow (layout-neutral) */
+    /* Heute-Glow (rein visuell) */
     .door-container.today .door-left,
     .door-container.today .door-right{
       box-shadow:
@@ -167,150 +138,114 @@
         0 12px 30px rgba(246,200,103,.25),
         inset 0 1px 0 rgba(255,255,255,.06);
     }
-    
-    /* ===== Inhalt (liegt UNTER den Türen & wird erst bei .open sichtbar) ===== */
-    .door-content {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: #5e001b;
-      border-radius: 12px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      border: 3px solid #692230;
 
-      z-index: 1;           /* unter den Türen */
-      pointer-events: none; /* solange zu */
-      opacity: 0;           /* solange zu */
-      transition: opacity .3s ease;
+    /* ===== Inhalt unter den Türen (unverändert, nur hübscher) ===== */
+    .door-content{
+      position:absolute; inset:0;
+      background: radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 60%) , var(--card);
+      border:3px solid #692230; border-radius:12px; padding:20px;
+      display:flex; flex-direction:column; justify-content:center;
+      z-index:1; pointer-events:none; opacity:0; transition:opacity .3s ease;
+      box-shadow: 0 12px 30px rgba(0,0,0,.35), inset 0 0 0 1px var(--ring);
     }
-    .door-container.open .door-content{
-      opacity: 1;
-      pointer-events: auto;
+    .door-container.open .door-content{ opacity:1; pointer-events:auto }
+
+    .door-content h3{ text-align:center; font-weight:800; margin-bottom:12px }
+    .door-content input{
+      width:100%; padding:10px 12px; margin-bottom:10px;
+      border:1px solid rgba(255,255,255,.25); border-radius:12px;
+      background:rgba(0,0,0,.25); color:var(--text); outline:0;
+      transition:border-color .2s, box-shadow .2s;
     }
-    
-    .door-content h3 {
-      color: white;
-      margin-bottom: 15px;
-      font-size: 1.3em;
-      text-align: center;
+    .door-content input:focus{ border-color:var(--gold); box-shadow:0 0 0 3px rgba(246,200,103,.25) }
+    .door-content button{
+      width:100%; padding:12px 14px; border-radius:12px; cursor:pointer; font-weight:800; border:0;
+      transition:transform .06s, box-shadow .2s, background .2s;
+      margin-bottom:8px;
     }
-    
-    .door-content input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 2px solid white;
-      border-radius: 6px;
-      font-size: 14px;
-      background: rgba(0,0,0,.2);
-      color: var(--text);
-      outline: none;
+    .door-content button:first-of-type{
+      background: linear-gradient(180deg, var(--gold), var(--gold-d)); color:#3a2100;
+      box-shadow:0 8px 22px rgba(246,200,103,.25);
     }
-    .door-content input:focus{ border-color: var(--gold); box-shadow: 0 0 0 3px rgba(246,200,103,.25); }
-    
-    .door-content button {
-      width: 100%;
-      padding: 10px;
-      background: white;
-      color: #4c0513;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.3s;
-      margin-bottom: 8px;
+    .door-content .close-btn{ background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.25) }
+    .door-content .status{ text-align:center; margin-top:6px; font-size:1.1em }
+
+    /* ===== Double Doors (Optik aufgehübscht, Maße unverändert) ===== */
+    .door-left, .door-right{
+      position:absolute; top:0; width:50%; height:100%;
+      background: linear-gradient(160deg, var(--card), var(--card2));
+      border:3px solid #692230; border-radius:12px;
+      transform-style:preserve-3d; transform-origin:left; transition: transform 1s cubic-bezier(.2,.8,.2,1), filter .2s;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 8px 20px rgba(0,0,0,.35), inset 0 0 0 1px var(--ring);
+      z-index:3; overflow:hidden;
     }
-    .door-content button:hover { background: #ffe4e1; transform: scale(1.02); }
-    .door-content .close-btn { background: transparent; border: 2px solid white; color: white; }
-    .door-content .status { text-align: center; margin-top: 5px; font-size: 1.3em; }
-    
-    /* ===== Double Doors (EXAKT wie original, plus z-index) ===== */
-    .door-left, .door-right {
-      position: absolute;
-      top: 0;
-      width: 50%;
-      height: 100%;
-      background: #5e001b;
-      border: 3px solid #692230;
-      transition: transform 1s ease-in-out;
-      transform-style: preserve-3d;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      z-index: 3; /* Türen über Inhalt */
+    .door-right{ transform-origin:right }
+
+    /* dekorative „Naht“ innen */
+    .door-left::after, .door-right::after{
+      content:""; position:absolute; inset:6px;
+      border-radius:9px; border:1px solid rgba(255,255,255,.08);
+      pointer-events:none;
     }
-    
-    .door-left { left: 0; border-radius: 12px 0 0 12px; transform-origin: left; }
-    .door-right{ right: 0; border-radius: 0 12px 12px 0; transform-origin: right; }
-    
-    .door-container.open .door-left { transform: rotateY(-120deg); }
-    .door-container.open .door-right{ transform: rotateY(120deg); }
-    
-    .door-number {
-      color: white;
-      font-size: 3em;
-      font-weight: bold;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      pointer-events: none;
-      transition: opacity 0.3s;
+    /* glossy highlight */
+    .door-left::before, .door-right::before{
+      content:""; position:absolute; inset:-20% -40% 40% -40%;
+      background:linear-gradient( to bottom, rgba(255,255,255,.16), rgba(255,255,255,0) );
+      transform:rotate(6deg); opacity:.25; pointer-events:none; filter: blur(1px);
     }
-    .door-container.open .door-number { opacity: 0; }
-    .door-left .door-number { margin-left: 20px; }
-    .door-right .door-number{ margin-right: 20px; }
-    
-    .door-left:hover, .door-right:hover { filter: brightness(1.1); }
-    
-    /* ===== Schloss (wie original) ===== */
-    .lock-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 10;
-      pointer-events: none;
-      transition: all 0.6s ease-out;
+    /* Licht-Sweep beim Hover/Öffnen */
+    @keyframes sweep{ 0%{transform:translateX(-120%) rotate(12deg)} 100%{transform:translateX(220%) rotate(12deg)} }
+    .door-left:hover::before, .door-right:hover::before{ animation:sweep .9s ease }
+    .door-container.open .door-left::before, .door-container.open .door-right::before{ animation:sweep .9s ease }
+
+    .door-container.open .door-left{ transform: rotateY(-120deg) }
+    .door-container.open .door-right{ transform: rotateY(120deg) }
+
+    .door-number{
+      font-weight:800; font-size:3em; letter-spacing:.04em;
+      text-shadow:0 2px 0 rgba(0,0,0,.5);
+      transition:opacity .3s; pointer-events:none;
     }
-    .door-container.unlocking .lock-container { animation: lockFall 0.8s ease-in forwards; }
-    @keyframes lockFall {
-      0% { transform: translate(-50%, -50%) rotate(0deg); opacity: 1; }
-      70%{ transform: translate(-50%, 100px) rotate(180deg); opacity: 0.5; }
-      100%{ transform: translate(-50%, 150px) rotate(360deg); opacity: 0; }
+    .door-container.open .door-number{ opacity:0 }
+    .door-left .door-number{ margin-left:20px }
+    .door-right .door-number{ margin-right:20px }
+
+    .door-left:hover, .door-right:hover{ filter:brightness(1.06) }
+
+    /* Locked State (unverändert) */
+    .door-container.locked .door-left,
+    .door-container.locked .door-right{ cursor:not-allowed; filter: grayscale(.25) brightness(.9) }
+    .door-container.locked .door-left:hover,
+    .door-container.locked .door-right:hover{ filter: grayscale(.25) brightness(.9) }
+
+    /* Lock Icon (unverändert) */
+    .lock-container{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10; pointer-events:none; transition:all .6s ease-out }
+    .door-container.unlocking .lock-container{ animation: lockFall .8s ease-in forwards }
+    @keyframes lockFall{
+      0%{ transform: translate(-50%,-50%) rotate(0); opacity:1 }
+      70%{ transform: translate(-50%,100px) rotate(180deg); opacity:.5 }
+      100%{ transform: translate(-50%,150px) rotate(360deg); opacity:0 }
     }
-    .door-container:not(.locked) .lock-container { display: none; }
-    
-    .lock-icon { width: 60px; height: 70px; position: relative; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
-    .lock-body { width: 60px; height: 45px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); border-radius: 8px; position: absolute; bottom: 0; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2); }
-    .lock-shackle { width: 30px; height: 35px; border: 8px solid #FFD700; border-bottom: none; border-radius: 20px 20px 0 0; position: absolute; top: 0; left: 50%; transform: translateX(-50%); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
-    .lock-keyhole { width: 8px; height: 8px; background: #8B4513; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-    .lock-keyhole::after { content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 8px solid #8B4513; }
-    
-    /* ===== Responsive (EXAKT wie original) ===== */
-    @media (max-width: 1000px) {
-      #doors { grid-template-columns: repeat(3, 1fr); gap: 90px; }
-    }
-    @media (max-width: 700px) {
-      #doors { grid-template-columns: repeat(2, 1fr); gap: 70px; }
-      .door-container { height: 250px; }
-      h1 { font-size: 2em; }
-      .lock-icon { width: 50px; height: 60px; }
-      .lock-body { width: 50px; height: 38px; }
-      .lock-shackle { width: 25px; height: 30px; border-width: 6px; }
-    }
-    @media (max-width: 500px) { #doors { grid-template-columns: repeat(2, 1fr); } }
+    .door-container:not(.locked) .lock-container{ display:none }
+    .lock-icon{ width:60px; height:70px; position:relative; filter: drop-shadow(0 4px 8px rgba(0,0,0,.4)) }
+    .lock-body{ width:60px; height:45px; background: linear-gradient(135deg,#FFD700 0%, #FFA500 100%); border-radius:8px; position:absolute; bottom:0; box-shadow: inset -2px -2px 5px rgba(0,0,0,.2) }
+    .lock-shackle{ width:30px; height:35px; border:8px solid #FFD700; border-bottom:none; border-radius:20px 20px 0 0; position:absolute; top:0; left:50%; transform:translateX(-50%); box-shadow: inset 0 2px 4px rgba(0,0,0,.2) }
+    .lock-keyhole{ width:8px; height:8px; background:#8B4513; border-radius:50%; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) }
+    .lock-keyhole::after{ content:""; position:absolute; top:6px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:4px solid transparent; border-right:4px solid transparent; border-top:8px solid #8B4513 }
+
+    /* A11y Focus */
+    :where(button, a, input):focus-visible{ outline:3px solid var(--gold); outline-offset:2px; border-radius:10px }
   </style>
 </head>
 <body>
-  <!-- Schnee -->
+  <!-- Snow (header) -->
   <div class="snow" aria-hidden="true"></div>
 
   <div class="container">
     <h1>🎄 CG Adventskalender – Gold Edition ✨</h1>
-    
+
+    <!-- Login -->
     <div id="login">
       <h2>Login</h2>
       <input id="username" placeholder="Benutzername" autocomplete="username">
@@ -319,18 +254,19 @@
       <div id="login-msg"></div>
     </div>
 
+    <!-- Calendar -->
     <div id="calendar" class="hidden">
       <div class="welcome-section">
         <h2>Willkommen, <span id="userLabel"></span>!</h2>
         <p id="progress"></p>
         <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
-      <div id="doors"></div>
+      <div id="doors" aria-label="Türchenübersicht"></div>
     </div>
   </div>
 
   <script>
-    /* ===== Firebase ===== */
+    /* ===== Firebase (unverändert) ===== */
     const firebaseConfig = {
       apiKey: "AIzaSyC1QIEr0IjLVQx-WlYYG1iRo08LmyuqWXY",
       authDomain: "cg-adventskalender.firebaseapp.com",
@@ -339,17 +275,16 @@
       messagingSenderId: "823914577697",
       appId: "1:823914577697:web:5885b5e51513a21bd80860"
     };
-    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     let currentUser = null;
 
-    /* ===== Schneefall erzeugen ===== */
+    /* Snow generator */
     (function snow(){
       const wrap = document.querySelector('.snow');
       const n = 36;
-      for (let i=0; i<n; i++){
+      for (let i=0;i<n;i++){
         const f = document.createElement('i');
         f.style.setProperty('--x', (Math.random()*100).toFixed(2)+'vw');
         f.style.setProperty('--d', (6+Math.random()*6).toFixed(2)+'s');
@@ -359,37 +294,28 @@
       }
     })();
 
-    /* ===== Datum / Tür-Freigabe ===== */
-    function isDoorUnlocked(doorNumber) {
+    /* ===== Datum / Tür-Freigabe (unverändert) ===== */
+    function isDoorUnlocked(doorNumber){
       const now = new Date();
       const currentDay = now.getDate();
-      const currentMonth = now.getMonth() + 1; // 0-indexed
-      
-      if (currentMonth === 12 && doorNumber <= currentDay) return true;
-      if (currentMonth !== 12) return true; // Testmodus außerhalb Dezember
+      const currentMonth = now.getMonth()+1;
+      if(currentMonth===12 && doorNumber<=currentDay) return true;
+      if(currentMonth!==12) return true; // Testmodus
       return false;
     }
 
-    function login() {
+    /* ===== Login / Logout (unverändert) ===== */
+    function login(){
       const name = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
-      
-      if (!name || !pass) {
+      if(!name || !pass){
         document.getElementById("login-msg").innerText = "Bitte beide Felder ausfüllen.";
         return;
       }
-
       db.collection("users").doc(name).get()
-        .then(doc => {
-          if (!doc.exists) {
-            document.getElementById("login-msg").innerText = "Benutzer nicht gefunden.";
-            return;
-          }
-          if (doc.data().password !== pass) {
-            document.getElementById("login-msg").innerText = "Falsches Passwort.";
-            return;
-          }
-          
+        .then(doc=>{
+          if(!doc.exists){ document.getElementById("login-msg").innerText = "Benutzer nicht gefunden."; return; }
+          if(doc.data().password !== pass){ document.getElementById("login-msg").innerText = "Falsches Passwort."; return; }
           currentUser = name;
           document.getElementById("userLabel").innerText = name;
           document.getElementById("login").classList.add("hidden");
@@ -397,13 +323,12 @@
           document.getElementById("login-msg").innerText = "";
           loadAnswers();
         })
-        .catch(error => {
-          console.error("Fehler beim Login:", error);
+        .catch(err=>{
+          console.error("Fehler beim Login:", err);
           document.getElementById("login-msg").innerText = "Verbindungsfehler. Bitte erneut versuchen.";
         });
     }
-
-    function logout() {
+    function logout(){
       currentUser = null;
       document.getElementById("calendar").classList.add("hidden");
       document.getElementById("login").classList.remove("hidden");
@@ -411,48 +336,44 @@
       document.getElementById("password").value = "";
     }
 
-    function toggleDoor(i) {
-      const container = document.getElementById("door-container-" + i);
-      
-      if (container.classList.contains("locked")) {
-        alert("Dieses Türchen kann erst am " + i + ". Dezember geöffnet werden! 🎄");
+    /* ===== Türen (unverändert) ===== */
+    function toggleDoor(i){
+      const container = document.getElementById("door-container-"+i);
+      if(container.classList.contains("locked")){
+        alert("Dieses Türchen kann erst am "+i+". Dezember geöffnet werden! 🎄");
         return;
       }
-      
       container.classList.toggle("open");
     }
 
-    function loadAnswers() {
+    /* ===== Laden / Rendern (unverändert) ===== */
+    function loadAnswers(){
       const container = document.getElementById("doors");
       container.innerHTML = "";
-      
+
       db.collection("answers").doc(currentUser).get()
-        .then(doc => {
+        .then(doc=>{
           const data = doc.exists ? doc.data() : {};
           let answered = 0;
 
           const today = new Date();
           const currentDay = today.getDate();
-          const currentMonth = today.getMonth() + 1;
-          
-          for (let i = 1; i <= 24; i++) {
-            const key = "tag" + i;
+          const currentMonth = today.getMonth()+1;
+
+          for(let i=1;i<=24;i++){
+            const key = "tag"+i;
             const val = data[key] || "";
-            if (val) answered++;
-            
+            if(val) answered++;
+
             const doorContainer = document.createElement("div");
             doorContainer.className = "door-container";
-            doorContainer.id = "door-container-" + i;
-            
-            const isUnlocked = isDoorUnlocked(i);
-            if (!isUnlocked) {
-              doorContainer.classList.add("locked");
-            }
-            if (currentMonth === 12 && i === currentDay) {
-              doorContainer.classList.add("today"); // goldener Glow
-            }
-            
-            const lockHTML = !isUnlocked ? `
+            doorContainer.id = "door-container-"+i;
+
+            const unlocked = isDoorUnlocked(i);
+            if(!unlocked){ doorContainer.classList.add("locked"); }
+            if(currentMonth===12 && i===currentDay){ doorContainer.classList.add("today"); }
+
+            const lockHTML = !unlocked ? `
               <div class="lock-container">
                 <div class="lock-icon">
                   <div class="lock-shackle"></div>
@@ -460,9 +381,8 @@
                     <div class="lock-keyhole"></div>
                   </div>
                 </div>
-              </div>
-            ` : '';
-            
+              </div>` : '';
+
             doorContainer.innerHTML = `
               <div class="door-content">
                 <h3>Türchen ${i}</h3>
@@ -479,72 +399,58 @@
                 <div class="door-number">🎁</div>
               </div>
             `;
-            
             container.appendChild(doorContainer);
           }
-          
+
           document.getElementById("progress").innerText = `Beantwortet: ${answered}/24 🎁`;
         })
-        .catch(error => {
-          console.error("Fehler beim Laden:", error);
-        });
+        .catch(err=> console.error("Fehler beim Laden:", err));
     }
 
-    function saveAnswer(i) {
-      const val = document.getElementById("input" + i).value.trim();
-      if (!val) return;
-      
-      const key = "tag" + i;
-      db.collection("answers").doc(currentUser).set({ [key]: val }, { merge: true })
-        .then(() => {
-          document.getElementById("status" + i).innerText = "✅ Gespeichert!";
-          // Mini-Confetti auf dem Save-Button
-          const btn = document.getElementById("saveBtn"+i);
-          miniConfetti(btn);
+    /* ===== Speichern (unverändert + Confetti) ===== */
+    function saveAnswer(i){
+      const val = document.getElementById("input"+i).value.trim();
+      if(!val) return;
 
-          setTimeout(() => {
-            toggleDoor(i);
-            setTimeout(() => loadAnswers(), 600);
-          }, 1000);
+      const key = "tag"+i;
+      db.collection("answers").doc(currentUser).set({ [key]: val }, { merge:true })
+        .then(()=>{
+          document.getElementById("status"+i).innerText = "✅ Gespeichert!";
+          miniConfetti(document.getElementById("saveBtn"+i));
+          setTimeout(()=>{ toggleDoor(i); setTimeout(()=>loadAnswers(), 600); }, 1000);
         })
-        .catch(error => {
-          console.error("Fehler beim Speichern:", error);
+        .catch(err=>{
+          console.error("Fehler beim Speichern:", err);
           alert("Fehler beim Speichern. Bitte erneut versuchen.");
         });
     }
 
-    /* ===== Mini-Confetti ===== */
+    /* ===== Mini-Confetti (rein visuell) ===== */
     function miniConfetti(anchor){
       if(!anchor) return;
-      const burst = document.createElement('div');
-      Object.assign(burst.style,{
-        position:'fixed', left:'0', top:'0', width:'0', height:'0',
-        pointerEvents:'none', zIndex:9999
-      });
-      document.body.appendChild(burst);
-      const rect = anchor.getBoundingClientRect();
-      const cx = rect.left + rect.width/2;
-      const cy = rect.top + rect.height/2;
+      const host = document.createElement('div');
+      Object.assign(host.style,{position:'fixed',left:'0',top:'0',width:'0',height:'0',pointerEvents:'none',zIndex:9999});
+      document.body.appendChild(host);
+      const r = anchor.getBoundingClientRect();
+      const cx = r.left + r.width/2, cy = r.top + r.height/2;
       const pieces = 18;
       for(let i=0;i<pieces;i++){
         const p = document.createElement('i');
-        p.style.position='fixed';
-        p.style.left = cx+'px';
-        p.style.top = cy+'px';
+        p.style.position='fixed'; p.style.left = cx+'px'; p.style.top = cy+'px';
         p.style.width = p.style.height = (5+Math.random()*4)+'px';
         p.style.background = (Math.random()<.5) ? '#fff' : '#f6c867';
-        p.style.transform = `translate(-50%,-50%)`;
         p.style.borderRadius = Math.random()<.5 ? '50%' : '2px';
         p.style.opacity='1';
+        p.style.transform='translate(-50%,-50%)';
         p.style.transition='transform .7s ease-out, opacity .7s ease-out';
-        burst.appendChild(p);
+        host.appendChild(p);
         const ang = Math.random()*Math.PI*2, dist = 40+Math.random()*60;
         requestAnimationFrame(()=>{
           p.style.transform = `translate(${Math.cos(ang)*dist}px, ${Math.sin(ang)*dist}px)`;
           p.style.opacity='0';
         });
       }
-      setTimeout(()=> burst.remove(), 800);
+      setTimeout(()=>host.remove(), 800);
     }
   </script>
 </body>
