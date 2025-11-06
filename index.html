@@ -4,79 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adventskalender</title>
-
-  <!-- Firebase -->
+  
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
-
+  
   <style>
-    /* ===== Design Tokens ===== */
+    /* ===== Grundfarben & Akzente ===== */
     :root{
-      --bg:#2a0510;
+      --bg:#26000b;
       --bg2:#3a0b18;
-      --panel:#5d0a1c;
-      --panel2:#6a0f22;
-      --text:#ffffff;
-      --gold:#f6c867;         /* Akzent Gold */
+      --text:#fff;
+      --gold:#f6c867;
       --gold-d:#e2b75a;
-      --radius:16px;
-      --shadow:0 10px 25px rgba(0,0,0,.35);
     }
 
-    /* ===== Base / Reset ===== */
-    *, *::before, *::after{ box-sizing:border-box; }
-    html, body{ height:100%; }
-    body {
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans";
-      color:var(--text);
+    /* ===== Reset ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
       background:
         radial-gradient(1200px 600px at 50% -10%, var(--bg2) 0%, var(--bg) 60%),
         var(--bg);
       padding: 20px;
+      min-height: 100vh;
       padding-bottom: env(safe-area-inset-bottom);
-      min-height:100vh;
     }
+    
     .container { max-width: 1600px; margin: 0 auto; position:relative; z-index:2; }
-
+    
     h1 {
       text-align: center;
-      font-size: clamp(28px, 5.5vw, 56px);
-      margin: 10px 0 18px;
-      letter-spacing:.5px;
-      text-shadow: 0 2px 0 rgba(0,0,0,.35);
+      color: white;
+      font-size: 3em;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
-
+    
     .hidden { display: none; }
 
-    /* ===== Header Snow (dezent, nur oben) ===== */
+    /* ===== Schneefall (nur Header-Bereich, dezent) ===== */
     .snow{ pointer-events:none; position:fixed; inset:0 0 auto 0; height:180px; overflow:hidden; z-index:1 }
     .snow i{
       position:absolute; top:-10px; width:6px; height:6px; border-radius:50%;
       background:#fff; opacity:.95; animation: fall linear var(--d) infinite; left:var(--x);
     }
     @keyframes fall { to{ transform: translate3d(0, 220px, 0); } }
-
-    /* ===== Login ===== */
+    
+    /* ===== Login Styles (wie original, nur leicht veredelt) ===== */
     #login {
       background: rgba(255,255,255,.06);
       border:1px solid rgba(246,200,103,.35);
       backdrop-filter: blur(8px);
-      max-width: 420px;
-      margin: 22px auto 30px;
-      padding: 28px 24px;
-      border-radius: 18px;
-      box-shadow: 0 15px 40px rgba(0,0,0,.45);
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
+    
     #login h2 {
       color: var(--gold);
-      margin-bottom: 14px;
+      margin-bottom: 20px;
       text-align: center;
-      letter-spacing:.3px;
     }
+    
     #login input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 12px;
       margin: 10px 0;
       border: 1px solid rgba(255,255,255,.25);
       background: rgba(0,0,0,.25);
@@ -86,82 +82,84 @@
       outline: none;
       transition: border-color .2s ease, box-shadow .2s ease;
     }
-    #login input:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(246,200,103,.25);
-    }
+    #login input:focus{ border-color: var(--gold); box-shadow: 0 0 0 3px rgba(246,200,103,.25); }
+    
     #login button {
       width: 100%;
-      padding: 12px 14px;
+      padding: 12px;
       background: linear-gradient(180deg, var(--gold), var(--gold-d));
       color: #3a2100;
       border: none;
       border-radius: 12px;
       cursor: pointer;
       font-size: 18px;
-      font-weight: 800;
+      font-weight: bold;
       margin-top: 10px;
       transition: transform .06s ease, box-shadow .2s ease;
       box-shadow: 0 8px 22px rgba(246,200,103,.25);
     }
     #login button:active{ transform: translateY(1px); }
-    #login-msg {
-      color: #8fce00;
-      margin-top: 12px;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    /* ===== Calendar Header ===== */
-    #calendar { color: var(--text); }
+    
+    #login-msg { color: #8fce00; margin-top: 15px; text-align: center; font-weight: bold; }
+    
+    /* ===== Calendar Styles ===== */
+    #calendar { color: white; }
+    
     .welcome-section {
       text-align: center;
-      margin-bottom: 18px;
-      background: rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,.14);
-      padding: 18px;
+      margin-bottom: 30px;
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
       border-radius: 15px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
     }
-    .welcome-section h2 { font-size: clamp(20px, 3.8vw, 28px); margin-bottom: 6px; }
-    #progress { font-size: 1.1em; font-weight: 700; color: #ffe4e1; }
-
+    
+    .welcome-section h2 { font-size: 2em; margin-bottom: 10px; }
+    #progress { font-size: 1.3em; font-weight: bold; color: #ffe4e1; }
+    
     .logout-btn {
-      padding: 10px 24px;
+      padding: 10px 30px;
       background: transparent;
-      color: var(--text);
-      border:1px solid rgba(255,255,255,.25);
-      border-radius: 12px;
+      color: white;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
-      font-weight: 700;
-      margin-top: 12px;
-      transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+      font-weight: bold;
+      margin-top: 15px;
+      transition: all 0.3s;
     }
-    .logout-btn:hover{ background: rgba(255,255,255,.08); }
-    .logout-btn:active{ transform: translateY(1px); }
-
-    /* ===== Door Grid ===== */
+    .logout-btn:hover { background: rgba(255,255,255,.08); transform: none; }
+    
+    /* ===== Door Grid (EXAKT wie in deiner Ursprungsdatei) ===== */
     #doors {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      margin-top: 20px;
+      gap: 200px;          /* wichtig: große Abstände beibehalten */
+      margin-top: 30px;
     }
-    @media (max-width: 1200px) { #doors{ grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 800px)  { #doors{ grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 500px)  { #doors{ grid-template-columns: repeat(2, 1fr); } }
-
-    /* ===== Double Door Container ===== */
+    
+    /* ===== Double Door Container (EXAKT wie original) ===== */
     .door-container {
       position: relative;
       height: 280px;
       perspective: 1000px;
-      border-radius: var(--radius);
+      border-radius: 12px;
       isolation:isolate;
     }
+    
+    /* Locked Door Styling */
+    .door-container.locked .door-left,
+    .door-container.locked .door-right {
+      cursor: not-allowed;
+      filter: brightness(0.6);
+    }
+    .door-container.locked .door-left:hover,
+    .door-container.locked .door-right:hover {
+      filter: brightness(0.6);
+    }
 
-    /* Gold "today" glow (nur im Dezember) */
+    /* Heute-Glow (layout-neutral) */
     .door-container.today .door-left,
     .door-container.today .door-right{
       box-shadow:
@@ -169,116 +167,105 @@
         0 12px 30px rgba(246,200,103,.25),
         inset 0 1px 0 rgba(255,255,255,.06);
     }
-
-    /* Locked Door */
-    .door-container.locked .door-left,
-    .door-container.locked .door-right {
-      cursor: not-allowed;
-      filter: grayscale(.25) brightness(0.9);
-    }
-
-    /* ===== Inhalt (unter den Türen & erst beim Öffnen sichtbar) ===== */
-    .door-content{
+    
+    /* ===== Inhalt (liegt UNTER den Türen & wird erst bei .open sichtbar) ===== */
+    .door-content {
       position: absolute;
-      inset: 0;
-      margin: 8px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(246,200,103,.28);
-      backdrop-filter: blur(8px);
-      border-radius: 14px;
+      width: 100%;
+      height: 100%;
+      background: #5e001b;
+      border-radius: 12px;
       padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      box-shadow: 0 15px 40px rgba(0,0,0,.45);
+      border: 3px solid #692230;
 
-      z-index: 1;            /* unter den Türen */
-      pointer-events: none;  /* deaktiviert solange geschlossen */
-      opacity: 0;            /* unsichtbar solange geschlossen */
+      z-index: 1;           /* unter den Türen */
+      pointer-events: none; /* solange zu */
+      opacity: 0;           /* solange zu */
       transition: opacity .3s ease;
     }
     .door-container.open .door-content{
       opacity: 1;
-      pointer-events: auto;  /* erst jetzt bedienbar */
+      pointer-events: auto;
     }
-
+    
     .door-content h3 {
-      margin-bottom: 12px;
+      color: white;
+      margin-bottom: 15px;
       font-size: 1.3em;
       text-align: center;
     }
+    
     .door-content input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 10px;
       margin-bottom: 10px;
-      border: 1px solid rgba(255,255,255,.25);
-      border-radius: 12px;
-      background: rgba(0,0,0,.25);
+      border: 2px solid white;
+      border-radius: 6px;
+      font-size: 14px;
+      background: rgba(0,0,0,.2);
       color: var(--text);
-      font-size: 15px;
       outline: none;
-      transition: border-color .2s ease, box-shadow .2s ease;
     }
-    .door-content input:focus{
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(246,200,103,.25);
-    }
+    .door-content input:focus{ border-color: var(--gold); box-shadow: 0 0 0 3px rgba(246,200,103,.25); }
+    
     .door-content button {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 12px;
+      padding: 10px;
+      background: white;
+      color: #4c0513;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
-      font-weight: 800;
-      border:0;
-      transition: transform .06s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+      font-weight: bold;
+      transition: all 0.3s;
       margin-bottom: 8px;
     }
-    .door-content button:active{ transform: translateY(1px); }
-    .door-content button:first-of-type{
-      background: linear-gradient(180deg, var(--gold), var(--gold-d));
-      color:#3a2100;
-      box-shadow: 0 8px 22px rgba(246,200,103,.25);
-    }
-    .door-content .close-btn{
-      background: transparent;
-      color: var(--text);
-      border:1px solid rgba(255,255,255,.25);
-    }
-    .door-content .status { text-align: center; margin-top: 6px; font-size: 1.1em; }
-
-    /* ===== Double Doors ===== */
+    .door-content button:hover { background: #ffe4e1; transform: scale(1.02); }
+    .door-content .close-btn { background: transparent; border: 2px solid white; color: white; }
+    .door-content .status { text-align: center; margin-top: 5px; font-size: 1.3em; }
+    
+    /* ===== Double Doors (EXAKT wie original, plus z-index) ===== */
     .door-left, .door-right {
-      position: absolute; top: 0; width: 50%; height: 100%;
-      background: linear-gradient(160deg, var(--panel), var(--panel2));
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: #5e001b;
       border: 3px solid #692230;
-      transition: transform 1s cubic-bezier(.2,.8,.2,1), filter .2s ease;
+      transition: transform 1s ease-in-out;
       transform-style: preserve-3d;
       cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
-      border-radius: var(--radius);
-      z-index: 3; /* Türen ÜBER dem Inhalt */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 3; /* Türen über Inhalt */
     }
+    
     .door-left { left: 0; border-radius: 12px 0 0 12px; transform-origin: left; }
     .door-right{ right: 0; border-radius: 0 12px 12px 0; transform-origin: right; }
-
+    
     .door-container.open .door-left { transform: rotateY(-120deg); }
-    .door-container.open .door-right{ transform: rotateY( 120deg); }
-
+    .door-container.open .door-right{ transform: rotateY(120deg); }
+    
     .door-number {
       color: white;
       font-size: 3em;
-      font-weight: 800;
-      letter-spacing:.04em;
-      text-shadow:0 2px 0 rgba(0,0,0,.5);
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
       pointer-events: none;
       transition: opacity 0.3s;
     }
     .door-container.open .door-number { opacity: 0; }
-
-    .door-left:hover, .door-right:hover { filter: brightness(1.06); }
-
-    /* ===== Lock Icon ===== */
+    .door-left .door-number { margin-left: 20px; }
+    .door-right .door-number{ margin-right: 20px; }
+    
+    .door-left:hover, .door-right:hover { filter: brightness(1.1); }
+    
+    /* ===== Schloss (wie original) ===== */
     .lock-container {
       position: absolute;
       top: 50%;
@@ -290,32 +277,40 @@
     }
     .door-container.unlocking .lock-container { animation: lockFall 0.8s ease-in forwards; }
     @keyframes lockFall {
-      0%   { transform: translate(-50%, -50%) rotate(0deg);   opacity: 1; }
-      70%  { transform: translate(-50%, 100px) rotate(180deg); opacity: 0.5; }
-      100% { transform: translate(-50%, 150px) rotate(360deg); opacity: 0; }
+      0% { transform: translate(-50%, -50%) rotate(0deg); opacity: 1; }
+      70%{ transform: translate(-50%, 100px) rotate(180deg); opacity: 0.5; }
+      100%{ transform: translate(-50%, 150px) rotate(360deg); opacity: 0; }
     }
     .door-container:not(.locked) .lock-container { display: none; }
+    
     .lock-icon { width: 60px; height: 70px; position: relative; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
     .lock-body { width: 60px; height: 45px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); border-radius: 8px; position: absolute; bottom: 0; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2); }
     .lock-shackle { width: 30px; height: 35px; border: 8px solid #FFD700; border-bottom: none; border-radius: 20px 20px 0 0; position: absolute; top: 0; left: 50%; transform: translateX(-50%); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
     .lock-keyhole { width: 8px; height: 8px; background: #8B4513; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
     .lock-keyhole::after { content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 8px solid #8B4513; }
-
-    /* ===== A11y Focus ===== */
-    :where(button, a, input):focus-visible{
-      outline: 3px solid var(--gold);
-      outline-offset: 2px;
-      border-radius: 10px;
+    
+    /* ===== Responsive (EXAKT wie original) ===== */
+    @media (max-width: 1000px) {
+      #doors { grid-template-columns: repeat(3, 1fr); gap: 90px; }
     }
+    @media (max-width: 700px) {
+      #doors { grid-template-columns: repeat(2, 1fr); gap: 70px; }
+      .door-container { height: 250px; }
+      h1 { font-size: 2em; }
+      .lock-icon { width: 50px; height: 60px; }
+      .lock-body { width: 50px; height: 38px; }
+      .lock-shackle { width: 25px; height: 30px; border-width: 6px; }
+    }
+    @media (max-width: 500px) { #doors { grid-template-columns: repeat(2, 1fr); } }
   </style>
 </head>
 <body>
-  <!-- Snow in header -->
+  <!-- Schnee -->
   <div class="snow" aria-hidden="true"></div>
 
   <div class="container">
     <h1>🎄 CG Adventskalender – Gold Edition ✨</h1>
-
+    
     <div id="login">
       <h2>Login</h2>
       <input id="username" placeholder="Benutzername" autocomplete="username">
@@ -330,7 +325,7 @@
         <p id="progress"></p>
         <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
-      <div id="doors" aria-label="Türchenübersicht"></div>
+      <div id="doors"></div>
     </div>
   </div>
 
@@ -344,15 +339,16 @@
       messagingSenderId: "823914577697",
       appId: "1:823914577697:web:5885b5e51513a21bd80860"
     };
+    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     let currentUser = null;
 
-    /* ===== Snow generator ===== */
+    /* ===== Schneefall erzeugen ===== */
     (function snow(){
       const wrap = document.querySelector('.snow');
-      const n = 36; // dezent
+      const n = 36;
       for (let i=0; i<n; i++){
         const f = document.createElement('i');
         f.style.setProperty('--x', (Math.random()*100).toFixed(2)+'vw');
@@ -363,22 +359,21 @@
       }
     })();
 
-    /* ===== Helpers ===== */
-    // Check if door should be unlocked based on current date
+    /* ===== Datum / Tür-Freigabe ===== */
     function isDoorUnlocked(doorNumber) {
       const now = new Date();
       const currentDay = now.getDate();
       const currentMonth = now.getMonth() + 1; // 0-indexed
-
+      
       if (currentMonth === 12 && doorNumber <= currentDay) return true;
-      if (currentMonth !== 12) return true; // testing outside December
+      if (currentMonth !== 12) return true; // Testmodus außerhalb Dezember
       return false;
     }
 
     function login() {
       const name = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
-
+      
       if (!name || !pass) {
         document.getElementById("login-msg").innerText = "Bitte beide Felder ausfüllen.";
         return;
@@ -394,7 +389,7 @@
             document.getElementById("login-msg").innerText = "Falsches Passwort.";
             return;
           }
-
+          
           currentUser = name;
           document.getElementById("userLabel").innerText = name;
           document.getElementById("login").classList.add("hidden");
@@ -418,19 +413,19 @@
 
     function toggleDoor(i) {
       const container = document.getElementById("door-container-" + i);
-
+      
       if (container.classList.contains("locked")) {
         alert("Dieses Türchen kann erst am " + i + ". Dezember geöffnet werden! 🎄");
         return;
       }
-
+      
       container.classList.toggle("open");
     }
 
     function loadAnswers() {
       const container = document.getElementById("doors");
       container.innerHTML = "";
-
+      
       db.collection("answers").doc(currentUser).get()
         .then(doc => {
           const data = doc.exists ? doc.data() : {};
@@ -439,26 +434,25 @@
           const today = new Date();
           const currentDay = today.getDate();
           const currentMonth = today.getMonth() + 1;
-
+          
           for (let i = 1; i <= 24; i++) {
             const key = "tag" + i;
             const val = data[key] || "";
             if (val) answered++;
-
+            
             const doorContainer = document.createElement("div");
             doorContainer.className = "door-container";
             doorContainer.id = "door-container-" + i;
-
-            const unlocked = isDoorUnlocked(i);
-            if (!unlocked) {
+            
+            const isUnlocked = isDoorUnlocked(i);
+            if (!isUnlocked) {
               doorContainer.classList.add("locked");
             }
-            // Gold "today" glow (nur in Dezember)
             if (currentMonth === 12 && i === currentDay) {
-              doorContainer.classList.add("today");
+              doorContainer.classList.add("today"); // goldener Glow
             }
-
-            const lockHTML = !unlocked ? `
+            
+            const lockHTML = !isUnlocked ? `
               <div class="lock-container">
                 <div class="lock-icon">
                   <div class="lock-shackle"></div>
@@ -468,7 +462,7 @@
                 </div>
               </div>
             ` : '';
-
+            
             doorContainer.innerHTML = `
               <div class="door-content">
                 <h3>Türchen ${i}</h3>
@@ -485,10 +479,10 @@
                 <div class="door-number">🎁</div>
               </div>
             `;
-
+            
             container.appendChild(doorContainer);
           }
-
+          
           document.getElementById("progress").innerText = `Beantwortet: ${answered}/24 🎁`;
         })
         .catch(error => {
@@ -499,7 +493,7 @@
     function saveAnswer(i) {
       const val = document.getElementById("input" + i).value.trim();
       if (!val) return;
-
+      
       const key = "tag" + i;
       db.collection("answers").doc(currentUser).set({ [key]: val }, { merge: true })
         .then(() => {
@@ -519,7 +513,7 @@
         });
     }
 
-    /* ===== Micro-confetti (klein & leicht) ===== */
+    /* ===== Mini-Confetti ===== */
     function miniConfetti(anchor){
       if(!anchor) return;
       const burst = document.createElement('div');
