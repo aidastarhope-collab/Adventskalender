@@ -23,22 +23,23 @@
       position: relative;
     }
 
-    /* Snow Canvas Styling */
+    /* Snow Canvas Styling: im Hintergrund */
     #snow-canvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      pointer-events: none; /* so it doesn't block interactions */
-      z-index: 0; /* behind your content which has default or higher z-index */
+      pointer-events: none; /* klickbar bleiben für Buttons etc. */
+      z-index: 0; /* im Hintergrund */
     }
     
+    /* Container für Inhalte, oben drauf */
     .container {
       max-width: 1600px;
       margin: 0 auto;
-      position: relative; /* To ensure stacking context */
-      z-index: 1; /* Ensure content is above the snow */
+      position: relative;
+      z-index: 1; /* Inhalt über Schnee */
     }
     
     h1 {
@@ -51,7 +52,7 @@
     
     .hidden { display: none; }
     
-    /* Login Styles */
+    /* Login Formular */
     #login {
       background: white;
       max-width: 400px;
@@ -106,8 +107,9 @@
       font-weight: bold;
     }
     
-    /* Calendar Styles */
+    /* Kalender Bereich */
     #calendar {
+      display: none; /* standardmäßig versteckt */
       color: white;
     }
     
@@ -148,33 +150,29 @@
       transform: scale(1.05);
     }
     
-    /* Door Grid */
+    /* Tür Raster */
     #doors {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 200px;
+      gap: 20px;
       margin-top: 30px;
     }
     
-    /* Double Door Container */
+    /* Tür Container für Doppel Tür */
     .door-container {
       position: relative;
       height: 280px;
       perspective: 1000px;
     }
     
-    /* Locked Door Styling */
+    /* Zustand "locked" für Tür */
     .door-container.locked .door-left,
     .door-container.locked .door-right {
       cursor: not-allowed;
       filter: brightness(0.6);
     }
     
-    .door-container.locked .door-left:hover,
-    .door-container.locked .door-right:hover {
-      filter: brightness(0.6);
-    }
-    
+    /* Tür Inhalt */
     .door-content {
       position: absolute;
       width: 100%;
@@ -234,7 +232,7 @@
       font-size: 1.3em;
     }
     
-    /* Double Doors */
+    /* Doppel Tür */
     .door-left, .door-right {
       position: absolute;
       top: 0;
@@ -250,27 +248,29 @@
       justify-content: center;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-    
+
     .door-left {
       left: 0;
       border-radius: 12px 0 0 12px;
       transform-origin: left;
     }
-    
+
     .door-right {
       right: 0;
       border-radius: 0 12px 12px 0;
       transform-origin: right;
     }
-    
+
+    /* Animation für öffnen der Tür */
     .door-container.open .door-left {
       transform: rotateY(-120deg);
     }
-    
+
     .door-container.open .door-right {
       transform: rotateY(120deg);
     }
-    
+
+    /* Tür Nummer sichtbar */
     .door-number {
       color: white;
       font-size: 3em;
@@ -279,24 +279,17 @@
       pointer-events: none;
       transition: opacity 0.3s;
     }
-    
+
     .door-container.open .door-number {
       opacity: 0;
     }
-    
-    .door-left .door-number {
-      margin-left: 20px;
-    }
-    
-    .door-right .door-number {
-      margin-right: 20px;
-    }
-    
+
+    /* Mouseover Effekt */
     .door-left:hover, .door-right:hover {
       filter: brightness(1.1);
     }
-    
-    /* Lock Icon */
+
+    /* Lock-Icon Container */
     .lock-container {
       position: absolute;
       top: 50%;
@@ -306,49 +299,30 @@
       pointer-events: none;
       transition: all 0.6s ease-out;
     }
-    
     .door-container.unlocking .lock-container {
       animation: lockFall 0.8s ease-in forwards;
     }
-    
     @keyframes lockFall {
-      0% {
-        transform: translate(-50%, -50%) rotate(0deg);
-        opacity: 1;
-      }
-      70% {
-        transform: translate(-50%, 100px) rotate(180deg);
-        opacity: 0.5;
-      }
-      100% {
-        transform: translate(-50%, 150px) rotate(360deg);
-        opacity: 0;
-      }
+      0% { transform: translate(-50%, -50%) rotate(0deg); opacity: 1; }
+      70% { transform: translate(-50%, 100px) rotate(180deg); opacity: 0.5; }
+      100% { transform: translate(-50%, 150px) rotate(360deg); opacity: 0; }
     }
-    
-    .door-container:not(.locked) .lock-container {
-      display: none;
-    }
-    
+    /* Lock Icon */
     .lock-icon {
       width: 60px;
       height: 70px;
-      position: relative;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
     }
-    
-    /* Lock body */
+    /* Lock Body */
     .lock-body {
       width: 60px;
       height: 45px;
       background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
       border-radius: 8px;
-      position: absolute;
-      bottom: 0;
+      position: relative;
       box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2);
+      margin: 0 auto;
     }
-    
-    /* Lock shackle */
+    /* Schlosshaken */
     .lock-shackle {
       width: 30px;
       height: 35px;
@@ -356,13 +330,12 @@
       border-bottom: none;
       border-radius: 20px 20px 0 0;
       position: absolute;
-      top: 0;
+      top: -15px;
       left: 50%;
       transform: translateX(-50%);
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
     }
-    
-    /* Keyhole */
+    /* Schlüsselloch */
     .lock-keyhole {
       width: 8px;
       height: 8px;
@@ -373,7 +346,6 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
-    
     .lock-keyhole::after {
       content: '';
       position: absolute;
@@ -387,59 +359,24 @@
       border-top: 8px solid #8B4513;
     }
 
-    /* Responsive */
-    @media (max-width: 1000px) {
-      #doors {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 90px;
-      }
+    /* Responsiveness */
+    @media(max-width: 1000px) {
+      #doors { grid-template-columns: repeat(3, 1fr); gap: 90px; }
     }
-    
-    @media (max-width: 700px) {
-      #doors {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 70px;
-      }
-      
-      .door-container {
-        height: 250px;
-      }
-      
-      h1 {
-        font-size: 2em;
-      }
-      
-      .lock-icon {
-        width: 50px;
-        height: 60px;
-      }
-      
-      .lock-body {
-        width: 50px;
-        height: 38px;
-      }
-      
-      .lock-shackle {
-        width: 25px;
-        height: 30px;
-        border-width: 6px;
-      }
-    }
-    
-    @media (max-width: 500px) {
-      #doors {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    @media(max-width: 700px) {
+      #doors { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 2em; }
     }
   </style>
 </head>
 <body>
-  <!-- Snow Canvas -->
+  <!-- Snow-Canvas im Hintergrund -->
   <canvas id="snow-canvas"></canvas>
 
   <div class="container">
     <h1>🎄 CG Adventskalender 🎄</h1>
-    
+
+    <!-- Login Formular -->
     <div id="login">
       <h2>Login</h2>
       <input id="username" placeholder="Benutzername" />
@@ -448,24 +385,28 @@
       <div id="login-msg"></div>
     </div>
 
+    <!-- Kalenderbereich, initial versteckt -->
     <div id="calendar" class="hidden">
       <div class="welcome-section">
         <h2>Willkommen, <span id="userLabel"></span>!</h2>
         <p id="progress"></p>
         <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
+      
+      <!-- Tür-Gitter -->
       <div id="doors"></div>
     </div>
   </div>
 
-  <!-- Snow Animation Script -->
+  <!-- Snow Animation -->
   <script>
+    // Canvas Setup
     const canvas = document.getElementById('snow-canvas');
     const ctx = canvas.getContext('2d');
 
     let snowflakes = [];
 
-    // Resize canvas
+    // Canvas Größe anpassen
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -473,9 +414,9 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Create snowflakes
+    // Schneeflocken erstellen
     function createSnowflakes() {
-      const count = 200; // Adjust number of snowflakes
+      const count = 200; // Anzahl der Schneeflocken
       for (let i=0; i<count; i++) {
         snowflakes.push({
           x: Math.random() * window.innerWidth,
@@ -487,10 +428,9 @@
         });
       }
     }
-
     createSnowflakes();
 
-    // Animate snow
+    // Schneeflocken animieren
     function animateSnow() {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       for (let flake of snowflakes) {
@@ -500,15 +440,16 @@
         ctx.fillStyle = 'white';
         ctx.fill();
 
-        // Move snowflake
+        // Bewegung der Schneeflocke
         flake.y += flake.speed;
         flake.x += flake.drift;
 
-        // Reset if off screen
+        // Reset, wenn unten
         if (flake.y > window.innerHeight) {
           flake.y = -flake.radius;
           flake.x = Math.random() * window.innerWidth;
         }
+        // Reset, wenn seitlich
         if (flake.x > window.innerWidth || flake.x < 0) {
           flake.x = Math.random() * window.innerWidth;
         }
@@ -517,6 +458,27 @@
     }
 
     animateSnow();
+
+    // Hier kannst du deine Firebase-Login-Logik ergänzen
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      // Beispiel: Einfacher Login ohne Firebase (nur für Test)
+      if (username && password) {
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('calendar').style.display = 'block';
+        document.getElementById('userLabel').innerText = username;
+        // TODO: Hier Firebase-Authentifizierung integrieren
+      } else {
+        document.getElementById('login-msg').innerText = 'Bitte Benutzername und Passwort eingeben!';
+      }
+    }
+
+    function logout() {
+      document.getElementById('login').classList.remove('hidden');
+      document.getElementById('calendar').style.display = 'none';
+    }
   </script>
 </body>
 </html>
