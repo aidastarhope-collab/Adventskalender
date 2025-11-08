@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adventskalender</title>
   
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
   
@@ -16,7 +20,7 @@
     }
     
     body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #26000b 0%, #4a0820 25%, #2d0a1f 50%, #1a0510 75%, #26000b 100%);
       background-attachment: fixed;
       padding: 20px;
@@ -70,6 +74,8 @@
       font-size: 3em;
       margin-bottom: 30px;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
     }
     
     .hidden { display: none; }
@@ -88,6 +94,8 @@
       color: #26000b;
       margin-bottom: 20px;
       text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
     }
     
     #login input {
@@ -145,6 +153,8 @@
     .welcome-section h2 {
       font-size: 2em;
       margin-bottom: 10px;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
     }
     
     #progress {
@@ -216,6 +226,8 @@
       margin-bottom: 15px;
       font-size: 1.3em;
       text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
     }
     
     .door-content input {
@@ -307,6 +319,10 @@
       opacity: 0;
     }
     
+    .door-container.open .crystal-icon {
+      opacity: 0;
+    }
+    
     .door-left .door-number {
       margin-left: 20px;
     }
@@ -321,6 +337,7 @@
       height: 60px;
       object-fit: contain;
       filter: drop-shadow(0 2px 8px rgba(255,255,255,0.3));
+      transition: opacity 0.3s;
     }
     
     .door-left:hover, .door-right:hover {
