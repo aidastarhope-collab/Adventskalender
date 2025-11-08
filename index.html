@@ -5,177 +5,423 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adventskalender</title>
   
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
   
   <style>
-    :root{
-      --bg:#26000b; --bg2:#3a0b18; --text:#fff;
-      --gold:#f6c867; --gold-d:#e2b75a;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-
-    *{margin:0;padding:0;box-sizing:border-box}
-
-    body{
-      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color:var(--text);
-      background: radial-gradient(1200px 600px at 50% -10%, var(--bg2) 0%, var(--bg) 60%), var(--bg);
-      min-height:100vh; padding:20px;
-      padding-bottom: env(safe-area-inset-bottom);
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #26000b;
+      padding: 20px;
+      min-height: 100vh;
     }
-
-    .container{max-width:1600px;margin:0 auto;position:relative;z-index:2}
-
-    h1{
-      text-align:center;color:#fff;font-size:3em;margin-bottom:30px;
-      text-shadow: 0 2px 0 rgba(0,0,0,.35);
+    
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
     }
-
-    .hidden{display:none}
-
-    /* Schneefall nur im Header-Bereich – visuell, ohne Layout-Einfluss */
-    .snow{pointer-events:none;position:fixed;inset:0 0 auto 0;height:180px;overflow:hidden;z-index:1}
-    .snow i{position:absolute;top:-10px;width:6px;height:6px;border-radius:50%;background:#fff;opacity:.95;animation:fall linear var(--d) infinite;left:var(--x)}
-    @keyframes fall {to{transform:translate3d(0,220px,0)}}
-
-    /* Login – Optik hübscher, Maße gleich */
-    #login{
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(246,200,103,.35);
-      backdrop-filter: blur(8px);
-      max-width:400px;margin:50px auto;padding:40px;border-radius:15px;
-      box-shadow:0 8px 20px rgba(0,0,0,.3);
+    
+    h1 {
+      text-align: center;
+      color: white;
+      font-size: 3em;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
-    #login h2{color:var(--gold);margin-bottom:20px;text-align:center}
-    #login input{
-      width:100%;padding:12px;margin:10px 0;
-      border:1px solid rgba(255,255,255,.25);border-radius:12px;
-      background:rgba(0,0,0,.25);color:var(--text);font-size:16px;outline:0;
-      transition:border-color .2s, box-shadow .2s;
+    
+    .hidden { display: none; }
+    
+    /* Login Styles */
+    #login {
+      background: white;
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
-    #login input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(246,200,103,.25)}
-    #login button{
-      width:100%;padding:12px;background:linear-gradient(180deg,var(--gold),var(--gold-d));color:#3a2100;
-      border:0;border-radius:12px;cursor:pointer;font-size:18px;font-weight:bold;margin-top:10px;
-      transition:transform .06s, box-shadow .2s; box-shadow:0 8px 22px rgba(246,200,103,.25);
+    
+    #login h2 {
+      color: #ffd966;
+      margin-bottom: 20px;
+      text-align: center;
     }
-    #login button:active{transform:translateY(1px)}
-    #login-msg{color:#8fce00;margin-top:15px;text-align:center;font-weight:bold}
-
-    /* Kalender-Header */
-    #calendar{color:#fff}
-    .welcome-section{
-      text-align:center;margin-bottom:30px;background:rgba(255,255,255,.1);
-      padding:20px;border-radius:15px;border:1px solid rgba(255,255,255,.14);
+    
+    #login input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
     }
-    .welcome-section h2{font-size:2em;margin-bottom:10px}
-    #progress{font-size:1.3em;font-weight:bold;color:#ffe4e1}
-    .logout-btn{
-      padding:10px 30px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.25);
-      border-radius:8px;cursor:pointer;font-size:16px;font-weight:bold;margin-top:15px;transition:background .2s;
+    
+    #login input:focus {
+      outline: none;
+      border-color: #c90076;
     }
-    .logout-btn:hover{background:rgba(255,255,255,.08)}
-
-    /* Grid – exakt wie original */
-    #doors{
-      display:grid; grid-template-columns: repeat(4, 1fr); gap:200px; margin-top:30px;
+    
+    #login button {
+      width: 100%;
+      padding: 12px;
+      background: #ce7e00;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: background 0.3s;
     }
-
-    /* Tür-Container – original Maße */
-    .door-container{position:relative;height:280px;perspective:1000px;border-radius:12px;isolation:isolate}
-
-    /* Heute-Glow (rein visuell) */
-    .door-container.today .door-left,
-    .door-container.today .door-right{
-      box-shadow:
-        0 0 0 2px rgba(246,200,103,.55),
-        0 12px 30px rgba(246,200,103,.25),
-        inset 0 1px 0 rgba(255,255,255,.06);
+    
+    #login button:hover {
+      background: #b22222;
     }
-
-    /* Inhalt – unter den Türen, erst bei .open sichtbar */
-    .door-content{
-      position:absolute; inset:0;
-      background:#5e001b;border:3px solid #692230;border-radius:12px;padding:20px;
-      display:flex;flex-direction:column;justify-content:center;
-      z-index:1; pointer-events:none; opacity:0; transition:opacity .3s ease;
-      box-shadow:0 12px 28px rgba(0,0,0,.35);
+    
+    #login-msg {
+      color: #8fce00;
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
     }
-    .door-container.open .door-content{opacity:1;pointer-events:auto}
-
-    .door-content h3{color:#fff;margin-bottom:15px;font-size:1.3em;text-align:center}
-    .door-content input{
-      width:100%;padding:10px;margin-bottom:10px;border:2px solid white;border-radius:6px;font-size:14px;
-      background:rgba(0,0,0,.2);color:#fff;outline:0;transition:border-color .2s, box-shadow .2s;
+    
+    /* Calendar Styles */
+    #calendar {
+      color: white;
     }
-    .door-content input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(246,200,103,.25)}
-    .door-content button{
-      width:100%;padding:10px;background:#fff;color:#4c0513;border:0;border-radius:6px;cursor:pointer;
-      font-weight:bold;transition:transform .06s, background .2s, box-shadow .2s;margin-bottom:8px;
+    
+    .welcome-section {
+      text-align: center;
+      margin-bottom: 30px;
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 15px;
     }
-    .door-content button:hover{background:#ffe4e1}
-    .door-content button:active{transform:translateY(1px)}
-    .door-content .close-btn{background:transparent;border:2px solid #fff;color:#fff}
-    .door-content .status{text-align:center;margin-top:5px;font-size:1.3em}
-
-    /* Doppel-Türen – exakt wie original, nur optisch leicht veredelt */
-    .door-left, .door-right{
-      position:absolute; top:0; width:50%; height:100%;
-      background:#5e001b; border:3px solid #692230; border-radius:12px;
-      transition:transform 1s ease-in-out, filter .2s ease; transform-style:preserve-3d;
-      cursor:pointer; display:flex; align-items:center; justify-content:center;
-      box-shadow:0 8px 20px rgba(0,0,0,.35);
-      z-index:3; /* Türen über Inhalt */
+    
+    .welcome-section h2 {
+      font-size: 2em;
+      margin-bottom: 10px;
     }
-    .door-left{ left:0;  transform-origin:left;  }
-    .door-right{ right:0; transform-origin:right; }
-
-    .door-container.open .door-left{ transform: rotateY(-120deg); }
-    .door-container.open .door-right{ transform: rotateY(120deg); }
-
-    .door-number{ color:#fff; font-size:3em; font-weight:bold; text-shadow:2px 2px 4px rgba(0,0,0,.5); pointer-events:none; transition:opacity .3s }
-    .door-container.open .door-number{ opacity:0 }
-    .door-left .door-number{ margin-left:20px }
-    .door-right .door-number{ margin-right:20px }
-    .door-left:hover, .door-right:hover{ filter:brightness(1.06) }
-
-    /* Locked-Zustand – wie original */
+    
+    #progress {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #ffe4e1;
+    }
+    
+    .logout-btn {
+      padding: 10px 30px;
+      background: white;
+      color: #6a329f;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 15px;
+      transition: all 0.3s;
+    }
+    
+    .logout-btn:hover {
+      background: #ffe4e1;
+      transform: scale(1.05);
+    }
+    
+    /* Door Grid */
+    #doors {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 200px;
+      margin-top: 30px;
+    }
+    
+    /* Double Door Container */
+    .door-container {
+      position: relative;
+      height: 280px;
+      perspective: 1000px;
+    }
+    
+    /* Locked Door Styling */
     .door-container.locked .door-left,
-    .door-container.locked .door-right{ cursor:not-allowed; filter:brightness(.6) }
-    .door-container.locked .door-left:hover,
-    .door-container.locked .door-right:hover{ filter:brightness(.6) }
-
-    /* Schloss – wie original */
-    .lock-container{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10; pointer-events:none; transition:all .6s ease-out }
-    .door-container.unlocking .lock-container{ animation:lockFall .8s ease-in forwards }
-    @keyframes lockFall{ 0%{transform:translate(-50%,-50%) rotate(0);opacity:1} 70%{transform:translate(-50%,100px) rotate(180deg);opacity:.5} 100%{transform:translate(-50%,150px) rotate(360deg);opacity:0} }
-    .door-container:not(.locked) .lock-container{ display:none }
-    .lock-icon{ width:60px;height:70px;position:relative;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4)) }
-    .lock-body{ width:60px;height:45px;background:linear-gradient(135deg,#FFD700 0%, #FFA500 100%);border-radius:8px;position:absolute;bottom:0;box-shadow:inset -2px -2px 5px rgba(0,0,0,.2) }
-    .lock-shackle{ width:30px;height:35px;border:8px solid #FFD700;border-bottom:none;border-radius:20px 20px 0 0;position:absolute;top:0;left:50%;transform:translateX(-50%);box-shadow:inset 0 2px 4px rgba(0,0,0,.2) }
-    .lock-keyhole{ width:8px;height:8px;background:#8B4513;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) }
-    .lock-keyhole::after{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:8px solid #8B4513}
-
-    /* Responsive – wie original */
-    @media (max-width:1000px){ #doors{ grid-template-columns:repeat(3,1fr); gap:90px } }
-    @media (max-width:700px){
-      #doors{ grid-template-columns:repeat(2,1fr); gap:70px }
-      .door-container{ height:250px } h1{ font-size:2em }
-      .lock-icon{width:50px;height:60px}.lock-body{width:50px;height:38px}.lock-shackle{width:25px;height:30px;border-width:6px}
+    .door-container.locked .door-right {
+      cursor: not-allowed;
+      filter: brightness(0.6);
     }
-    @media (max-width:500px){ #doors{ grid-template-columns:repeat(2,1fr) } }
-
-    /* Fokusstyle (A11y, ändert keine Maße) */
-    :where(button,a,input):focus-visible{ outline:3px solid var(--gold); outline-offset:2px; border-radius:10px }
+    
+    .door-container.locked .door-left:hover,
+    .door-container.locked .door-right:hover {
+      filter: brightness(0.6);
+    }
+    
+    .door-content {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #5e001b;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border: 3px solid #692230;
+    }
+    
+    .door-content h3 {
+      color: white;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+      text-align: center;
+    }
+    
+    .door-content input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 2px solid white;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .door-content button {
+      width: 100%;
+      padding: 10px;
+      background: white;
+      color: #4c0513;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      margin-bottom: 8px;
+    }
+    
+    .door-content button:hover {
+      background: #ffe4e1;
+      transform: scale(1.05);
+    }
+    
+    .door-content .close-btn {
+      background: transparent;
+      border: 2px solid white;
+      color: white;
+    }
+    
+    .door-content .status {
+      text-align: center;
+      margin-top: 5px;
+      font-size: 1.3em;
+    }
+    
+    /* Double Doors */
+    .door-left, .door-right {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: #5e001b;
+      border: 3px solid #692230;
+      transition: transform 1s ease-in-out;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .door-left {
+      left: 0;
+      border-radius: 12px 0 0 12px;
+      transform-origin: left;
+    }
+    
+    .door-right {
+      right: 0;
+      border-radius: 0 12px 12px 0;
+      transform-origin: right;
+    }
+    
+    .door-container.open .door-left {
+      transform: rotateY(-120deg);
+    }
+    
+    .door-container.open .door-right {
+      transform: rotateY(120deg);
+    }
+    
+    .door-number {
+      color: white;
+      font-size: 3em;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .door-container.open .door-number {
+      opacity: 0;
+    }
+    
+    .door-left .door-number {
+      margin-left: 20px;
+    }
+    
+    .door-right .door-number {
+      margin-right: 20px;
+    }
+    
+    .door-left:hover, .door-right:hover {
+      filter: brightness(1.1);
+    }
+    
+    /* Lock Icon */
+    .lock-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      pointer-events: none;
+      transition: all 0.6s ease-out;
+    }
+    
+    .door-container.unlocking .lock-container {
+      animation: lockFall 0.8s ease-in forwards;
+    }
+    
+    @keyframes lockFall {
+      0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+        opacity: 1;
+      }
+      70% {
+        transform: translate(-50%, 100px) rotate(180deg);
+        opacity: 0.5;
+      }
+      100% {
+        transform: translate(-50%, 150px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    .door-container:not(.locked) .lock-container {
+      display: none;
+    }
+    
+    .lock-icon {
+      width: 60px;
+      height: 70px;
+      position: relative;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    }
+    
+    /* Lock body */
+    .lock-body {
+      width: 60px;
+      height: 45px;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      border-radius: 8px;
+      position: absolute;
+      bottom: 0;
+      box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2);
+    }
+    
+    /* Lock shackle */
+    .lock-shackle {
+      width: 30px;
+      height: 35px;
+      border: 8px solid #FFD700;
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    /* Keyhole */
+    .lock-keyhole {
+      width: 8px;
+      height: 8px;
+      background: #8B4513;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .lock-keyhole::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 8px solid #8B4513;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1000px) {
+      #doors {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 90px;
+      }
+    }
+    
+    @media (max-width: 700px) {
+      #doors {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 70px;
+      }
+      
+      .door-container {
+        height: 250px;
+      }
+      
+      h1 {
+        font-size: 2em;
+      }
+      
+      .lock-icon {
+        width: 50px;
+        height: 60px;
+      }
+      
+      .lock-body {
+        width: 50px;
+        height: 38px;
+      }
+      
+      .lock-shackle {
+        width: 25px;
+        height: 30px;
+        border-width: 6px;
+      }
+    }
+    
+    @media (max-width: 500px) {
+      #doors {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- Schnee -->
-  <div class="snow" aria-hidden="true"></div>
-
   <div class="container">
-    <h1>🎄 CG Adventskalender – Gold Edition ✨</h1>
+    <h1>🎄 CG Adventskalender 🎄</h1>
     
     <div id="login">
       <h2>Login</h2>
@@ -196,7 +442,6 @@
   </div>
 
   <script>
-    /* Firebase */
     const firebaseConfig = {
       apiKey: "AIzaSyC1QIEr0IjLVQx-WlYYG1iRo08LmyuqWXY",
       authDomain: "cg-adventskalender.firebaseapp.com",
@@ -205,94 +450,115 @@
       messagingSenderId: "823914577697",
       appId: "1:823914577697:web:5885b5e51513a21bd80860"
     };
+    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     let currentUser = null;
 
-    /* Schnee erzeugen */
-    (function snow(){
-      const wrap = document.querySelector('.snow');
-      const n = 36;
-      for(let i=0;i<n;i++){
-        const f=document.createElement('i');
-        f.style.setProperty('--x',(Math.random()*100).toFixed(2)+'vw');
-        f.style.setProperty('--d',(6+Math.random()*6).toFixed(2)+'s');
-        f.style.width=f.style.height=(4+Math.random()*4).toFixed(0)+'px';
-        f.style.opacity=(0.7+Math.random()*0.3).toFixed(2);
-        wrap.appendChild(f);
+    // Check if door should be unlocked based on current date
+    function isDoorUnlocked(doorNumber) {
+      const now = new Date();
+      const currentDay = now.getDate();
+      const currentMonth = now.getMonth() + 1; // 0-indexed
+      
+      // Only unlock in December and only up to current day
+      if (currentMonth === 12 && doorNumber <= currentDay) {
+        return true;
       }
-    })();
-
-    /* Freigabe wie original */
-    function isDoorUnlocked(doorNumber){
-      const now=new Date(), day=now.getDate(), mon=now.getMonth()+1;
-      if(mon===12 && doorNumber<=day) return true;
-      if(mon!==12) return true;
+      
+      // For testing: unlock all doors in other months
+      if (currentMonth !== 12) {
+        return true;
+      }
+      
       return false;
     }
 
-    function login(){
-      const name=document.getElementById("username").value.trim();
-      const pass=document.getElementById("password").value.trim();
-      if(!name||!pass){ document.getElementById("login-msg").innerText="Bitte beide Felder ausfüllen."; return; }
+    function login() {
+      const name = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      
+      if (!name || !pass) {
+        document.getElementById("login-msg").innerText = "Bitte beide Felder ausfüllen.";
+        return;
+      }
+
       db.collection("users").doc(name).get()
-        .then(doc=>{
-          if(!doc.exists){ document.getElementById("login-msg").innerText="Benutzer nicht gefunden."; return; }
-          if(doc.data().password!==pass){ document.getElementById("login-msg").innerText="Falsches Passwort."; return; }
-          currentUser=name;
-          document.getElementById("userLabel").innerText=name;
+        .then(doc => {
+          if (!doc.exists) {
+            document.getElementById("login-msg").innerText = "Benutzer nicht gefunden.";
+            return;
+          }
+          if (doc.data().password !== pass) {
+            document.getElementById("login-msg").innerText = "Falsches Passwort.";
+            return;
+          }
+          
+          currentUser = name;
+          document.getElementById("userLabel").innerText = name;
           document.getElementById("login").classList.add("hidden");
           document.getElementById("calendar").classList.remove("hidden");
-          document.getElementById("login-msg").innerText="";
+          document.getElementById("login-msg").innerText = "";
           loadAnswers();
         })
-        .catch(err=>{
-          console.error("Fehler beim Login:",err);
-          document.getElementById("login-msg").innerText="Verbindungsfehler. Bitte erneut versuchen.";
+        .catch(error => {
+          console.error("Fehler beim Login:", error);
+          document.getElementById("login-msg").innerText = "Verbindungsfehler. Bitte erneut versuchen.";
         });
     }
 
-    function logout(){
-      currentUser=null;
+    function logout() {
+      currentUser = null;
       document.getElementById("calendar").classList.add("hidden");
       document.getElementById("login").classList.remove("hidden");
-      document.getElementById("username").value="";
-      document.getElementById("password").value="";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
     }
 
-    function toggleDoor(i){
-      const el=document.getElementById("door-container-"+i);
-      if(el.classList.contains("locked")){
-        alert("Dieses Türchen kann erst am "+i+". Dezember geöffnet werden! 🎄");
+    function toggleDoor(i) {
+      const container = document.getElementById("door-container-" + i);
+      
+      // Check if door is locked
+      if (container.classList.contains("locked")) {
+        // Show message that door is still locked
+        alert("Dieses Türchen kann erst am " + i + ". Dezember geöffnet werden! 🎄");
         return;
       }
-      el.classList.toggle("open");
+      
+      if (container.classList.contains("open")) {
+        // Close door
+        container.classList.remove("open");
+      } else {
+        // Open door
+        container.classList.add("open");
+      }
     }
 
-    function loadAnswers(){
-      const container=document.getElementById("doors");
-      container.innerHTML="";
+    function loadAnswers() {
+      const container = document.getElementById("doors");
+      container.innerHTML = "";
+      
       db.collection("answers").doc(currentUser).get()
-        .then(doc=>{
-          const data=doc.exists?doc.data():{};
-          let answered=0;
-
-          const now=new Date(), day=now.getDate(), mon=now.getMonth()+1;
-
-          for(let i=1;i<=24;i++){
-            const key="tag"+i, val=data[key]||"";
-            if(val) answered++;
-
-            const doorContainer=document.createElement("div");
-            doorContainer.className="door-container";
-            doorContainer.id="door-container-"+i;
-
-            const unlocked=isDoorUnlocked(i);
-            if(!unlocked) doorContainer.classList.add("locked");
-            if(mon===12 && i===day) doorContainer.classList.add("today");
-
-            const lockHTML=!unlocked?`
+        .then(doc => {
+          const data = doc.exists ? doc.data() : {};
+          let answered = 0;
+          
+          for (let i = 1; i <= 24; i++) {
+            const key = "tag" + i;
+            const val = data[key] || "";
+            if (val) answered++;
+            
+            const doorContainer = document.createElement("div");
+            doorContainer.className = "door-container";
+            doorContainer.id = "door-container-" + i;
+            
+            const isUnlocked = isDoorUnlocked(i);
+            if (!isUnlocked) {
+              doorContainer.classList.add("locked");
+            }
+            
+            const lockHTML = !isUnlocked ? `
               <div class="lock-container">
                 <div class="lock-icon">
                   <div class="lock-shackle"></div>
@@ -300,13 +566,14 @@
                     <div class="lock-keyhole"></div>
                   </div>
                 </div>
-              </div>`:"";
-
-            doorContainer.innerHTML=`
+              </div>
+            ` : '';
+            
+            doorContainer.innerHTML = `
               <div class="door-content">
                 <h3>Türchen ${i}</h3>
                 <input id="input${i}" value="${val}" placeholder="Deine Antwort">
-                <button id="saveBtn${i}" onclick="saveAnswer(${i})">Speichern</button>
+                <button onclick="saveAnswer(${i})">Speichern</button>
                 <button class="close-btn" onclick="toggleDoor(${i})">Schließen</button>
                 <div class="status" id="status${i}"></div>
               </div>
@@ -318,52 +585,34 @@
                 <div class="door-number">🎁</div>
               </div>
             `;
+            
             container.appendChild(doorContainer);
           }
-          document.getElementById("progress").innerText=`Beantwortet: ${answered}/24 🎁`;
+          
+          document.getElementById("progress").innerText = `Beantwortet: ${answered}/24 🎁`;
         })
-        .catch(err=>console.error("Fehler beim Laden:",err));
+        .catch(error => {
+          console.error("Fehler beim Laden:", error);
+        });
     }
 
-    function saveAnswer(i){
-      const val=document.getElementById("input"+i).value.trim();
-      if(!val) return;
-      const key="tag"+i;
-      db.collection("answers").doc(currentUser).set({ [key]: val }, { merge:true })
-        .then(()=>{
-          document.getElementById("status"+i).innerText="✅ Gespeichert!";
-          miniConfetti(document.getElementById("saveBtn"+i));
-          setTimeout(()=>{ toggleDoor(i); setTimeout(()=>loadAnswers(),600); },1000);
+    function saveAnswer(i) {
+      const val = document.getElementById("input" + i).value.trim();
+      if (!val) return;
+      
+      const key = "tag" + i;
+      db.collection("answers").doc(currentUser).set({ [key]: val }, { merge: true })
+        .then(() => {
+          document.getElementById("status" + i).innerText = "✅ Gespeichert!";
+          setTimeout(() => {
+            toggleDoor(i);
+            setTimeout(() => loadAnswers(), 600);
+          }, 1000);
         })
-        .catch(err=>{
-          console.error("Fehler beim Speichern:",err);
+        .catch(error => {
+          console.error("Fehler beim Speichern:", error);
           alert("Fehler beim Speichern. Bitte erneut versuchen.");
         });
-    }
-
-    /* Mini-Konfetti */
-    function miniConfetti(anchor){
-      if(!anchor) return;
-      const host=document.createElement('div');
-      Object.assign(host.style,{position:'fixed',left:'0',top:'0',width:'0',height:'0',pointerEvents:'none',zIndex:9999});
-      document.body.appendChild(host);
-      const r=anchor.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
-      const n=18;
-      for(let i=0;i<n;i++){
-        const p=document.createElement('i');
-        p.style.position='fixed'; p.style.left=cx+'px'; p.style.top=cy+'px';
-        p.style.width=p.style.height=(5+Math.random()*4)+'px';
-        p.style.background=(Math.random()<.5)?'#fff':'#f6c867';
-        p.style.borderRadius=Math.random()<.5?'50%':'2px';
-        p.style.opacity='1'; p.style.transform='translate(-50%,-50%)';
-        p.style.transition='transform .7s ease-out, opacity .7s ease-out';
-        host.appendChild(p);
-        const a=Math.random()*Math.PI*2, d=40+Math.random()*60;
-        requestAnimationFrame(()=>{
-          p.style.transform=`translate(${Math.cos(a)*d}px, ${Math.sin(a)*d}px)`; p.style.opacity='0';
-        });
-      }
-      setTimeout(()=>host.remove(),800);
     }
   </script>
 </body>
