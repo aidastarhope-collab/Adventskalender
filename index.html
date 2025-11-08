@@ -74,7 +74,7 @@
     .hidden { display: none; }
     
     /* Login Styles */
-    #login {
+    login {
       background: white;
       max-width: 400px;
       margin: 50px auto;
@@ -83,7 +83,7 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
     
-    #login h2 {
+    login h2 {
       color: #ffd966;
       margin-bottom: 20px;
       text-align: center;
@@ -100,13 +100,13 @@
     
     #login input:focus {
       outline: none;
-      border-color: #c90076;
+      border-color: #26000b;
     }
     
     #login button {
       width: 100%;
       padding: 12px;
-      background: #ce7e00;
+      background: #26000b;
       color: white;
       border: none;
       border-radius: 8px;
@@ -118,11 +118,11 @@
     }
     
     #login button:hover {
-      background: #b22222;
+      background: #26000b;
     }
     
     #login-msg {
-      color: #8fce00;
+      color: #26000b;
       margin-top: 15px;
       text-align: center;
       font-weight: bold;
@@ -149,13 +149,13 @@
     #progress {
       font-size: 1.3em;
       font-weight: bold;
-      color: #ffe4e1;
+      color: #ffffff;
     }
     
     .logout-btn {
       padding: 10px 30px;
       background: white;
-      color: #6a329f;
+      color: #26000b;
       border: none;
       border-radius: 8px;
       cursor: pointer;
@@ -166,7 +166,7 @@
     }
     
     .logout-btn:hover {
-      background: #ffe4e1;
+      background: #ffffff;
       transform: scale(1.05);
     }
     
@@ -666,7 +666,7 @@
             container.appendChild(doorContainer);
           }
           
-          document.getElementById("progress").innerText = `Beantwortet: ${answered}/24 🎁`;
+          document.getElementById("progress").innerText = `abgeschlossen: ${answered}/24 🎁`;
         })
         .catch(error => {
           console.error("Fehler beim Laden:", error);
