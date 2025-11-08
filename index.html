@@ -17,7 +17,8 @@
     
     body { 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #26000b;
+      background: linear-gradient(135deg, #26000b 0%, #4a0820 25%, #2d0a1f 50%, #1a0510 75%, #26000b 100%);
+      background-attachment: fixed;
       padding: 20px;
       min-height: 100vh;
       overflow-x: hidden;
@@ -84,7 +85,7 @@
     }
     
     #login h2 {
-      color: #ffd966;
+      color: #26000b;
       margin-bottom: 20px;
       text-align: center;
     }
@@ -312,6 +313,14 @@
     
     .door-right .door-number {
       margin-right: 20px;
+    }
+    
+    /* Crystal Image on right door */
+    .crystal-icon {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(255,255,255,0.3));
     }
     
     .door-left:hover, .door-right:hover {
@@ -659,7 +668,7 @@
                 <div class="door-number">${i}</div>
               </div>
               <div class="door-right" onclick="toggleDoor(${i})">
-                <div class="door-number">🎁</div>
+                <img src="crystal.png" class="crystal-icon" alt="Crystal" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\\'door-number\\'>🎁</div>';">
               </div>
             `;
             
