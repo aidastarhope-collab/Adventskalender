@@ -230,6 +230,21 @@
       font-weight: 700;
     }
     
+    .door-content .story-btn {
+      background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+      color: white;
+      border: 2px solid #FFD700;
+      margin-bottom: 15px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .door-content .story-btn:hover {
+      background: linear-gradient(135deg, #D2691E 0%, #FFB347 100%);
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    }
+    
     .door-content input {
       width: 100%;
       padding: 10px;
@@ -435,6 +450,96 @@
       border-top: 8px solid #8B4513;
     }
     
+    /* Story Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #5e001b 0%, #4a0820 100%);
+      border: 3px solid #FFD700;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+      animation: slideIn 0.4s ease-out;
+      position: relative;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-content h2 {
+      color: #FFD700;
+      font-family: 'Playfair Display', serif;
+      font-size: 2em;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .modal-content p {
+      color: white;
+      font-size: 1.1em;
+      line-height: 1.8;
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+    
+    .modal-close-btn {
+      width: 100%;
+      padding: 12px;
+      background: #FFD700;
+      color: #26000b;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: all 0.3s;
+    }
+    
+    .modal-close-btn:hover {
+      background: #FFA500;
+      transform: scale(1.05);
+    }
+    
     /* Responsive */
     @media (max-width: 1000px) {
       #doors {
@@ -519,6 +624,15 @@
     </div>
   </div>
 
+  <!-- Story Modal -->
+  <div class="modal-overlay" id="storyModal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Türchen 1</h2>
+      <div id="modalStory"></div>
+      <button class="modal-close-btn" onclick="closeStoryModal()">Schließen</button>
+    </div>
+  </div>
+
   <script>
     // Create snowflakes
     function createSnowflake() {
@@ -558,6 +672,52 @@
     const db = firebase.firestore();
 
     let currentUser = null;
+
+    // Story-Texte für jedes Türchen - HIER DEINE GESCHICHTEN EINFÜGEN!
+    const storyTexts = {
+      1: `<p>Es war einmal in einem verschneiten Winterdorf... Die Crystal Guards wurden gerufen, um ein großes Geheimnis zu lüften.</p><p><strong>Deine Aufgabe:</strong> Wie heißt der Hauptcharakter unserer Geschichte?</p>`,
+      2: `<p>Der Hauptcharakter machte sich auf den Weg durch den tiefen Schnee. Plötzlich tauchte ein mysteriöser Fremder auf...</p><p><strong>Deine Aufgabe:</strong> Was sagte der Fremde?</p>`,
+      3: `<p>Die Reise führt weiter in den magischen Wald. Zwischen den Bäumen glitzert etwas...</p><p><strong>Deine Aufgabe:</strong> Was haben die Crystal Guards gefunden?</p>`,
+      4: `<p>Ein neues Abenteuer beginnt! Die Guards entdecken eine alte Karte...</p><p><strong>Deine Aufgabe:</strong> Wohin führt die Karte?</p>`,
+      5: `<p>Die Spannung steigt... Ein Rätsel muss gelöst werden!</p><p><strong>Deine Aufgabe:</strong> Löse das Rätsel!</p>`,
+      6: `<p>Fortsetzung folgt... Die Guards treffen auf einen alten Weisen.</p><p><strong>Deine Aufgabe:</strong> Was ist die Weisheit des Tages?</p>`,
+      7: `<p>Eine Woche ist vergangen... Die Crystal Guards finden einen geheimen Pfad.</p><p><strong>Deine Aufgabe:</strong> Beschreibe den Pfad!</p>`,
+      8: `<p>Die zweite Woche beginnt mit einer Überraschung!</p><p><strong>Deine Aufgabe:</strong> Was ist passiert?</p>`,
+      9: `<p>Ein mysteriöser Nebel zieht auf...</p><p><strong>Deine Aufgabe:</strong> Was verbirgt sich im Nebel?</p>`,
+      10: `<p>Die Guards finden einen alten Tempel...</p><p><strong>Deine Aufgabe:</strong> Was steht auf der Inschrift?</p>`,
+      11: `<p>Ein magisches Artefakt wird entdeckt!</p><p><strong>Deine Aufgabe:</strong> Welche Kraft hat es?</p>`,
+      12: `<p>Die Hälfte des Abenteuers ist geschafft! Ein großes Fest wird gefeiert.</p><p><strong>Deine Aufgabe:</strong> Was gibt es zu essen?</p>`,
+      13: `<p>Die Geschichte nimmt eine unerwartete Wendung...</p><p><strong>Deine Aufgabe:</strong> Was passiert als nächstes?</p>`,
+      14: `<p>Ein Schneesturm zieht auf! Die Guards müssen Schutz suchen.</p><p><strong>Deine Aufgabe:</strong> Wo finden sie Unterschlupf?</p>`,
+      15: `<p>Die dritte Woche beginnt... Ein neuer Verbündeter erscheint!</p><p><strong>Deine Aufgabe:</strong> Wer ist es?</p>`,
+      16: `<p>Die Guards entdecken eine geheime Botschaft...</p><p><strong>Deine Aufgabe:</strong> Was steht in der Botschaft?</p>`,
+      17: `<p>Ein gefährlicher Gegner taucht auf!</p><p><strong>Deine Aufgabe:</strong> Wie sieht er aus?</p>`,
+      18: `<p>Die Guards müssen eine wichtige Entscheidung treffen...</p><p><strong>Deine Aufgabe:</strong> Welche?</p>`,
+      19: `<p>Ein magischer Kristall wird gefunden!</p><p><strong>Deine Aufgabe:</strong> Welche Farbe hat er?</p>`,
+      20: `<p>Die letzte Woche bricht an... Das Finale naht!</p><p><strong>Deine Aufgabe:</strong> Was ist das große Ziel?</p>`,
+      21: `<p>Die Spannung steigt... Noch 3 Tage bis zum großen Finale!</p><p><strong>Deine Aufgabe:</strong> Was muss noch vorbereitet werden?</p>`,
+      22: `<p>Fast geschafft! Die Guards bereiten sich auf die letzte Schlacht vor.</p><p><strong>Deine Aufgabe:</strong> Welche Waffe wählst du?</p>`,
+      23: `<p>Der vorletzte Tag... Die Ruhe vor dem Sturm.</p><p><strong>Deine Aufgabe:</strong> Was geht dir durch den Kopf?</p>`,
+      24: `<p>🎄 DAS GROSSE FINALE! 🎄</p><p>Die Crystal Guards haben es geschafft! Die Geschichte endet mit...</p><p><strong>Deine Aufgabe:</strong> Wie endet die Geschichte?</p>`
+    };
+
+    function openStoryModal(doorNumber) {
+      document.getElementById('modalTitle').innerText = 'Türchen ' + doorNumber;
+      document.getElementById('modalStory').innerHTML = storyTexts[doorNumber] || '<p>Hier könnte deine Geschichte stehen...</p>';
+      document.getElementById('storyModal').classList.add('active');
+    }
+
+    function closeStoryModal() {
+      document.getElementById('storyModal').classList.remove('active');
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+      const modal = document.getElementById('storyModal');
+      if (event.target === modal) {
+        closeStoryModal();
+      }
+    });
 
     // Check if door should be unlocked based on current date
     function isDoorUnlocked(doorNumber) {
@@ -675,6 +835,7 @@
             doorContainer.innerHTML = `
               <div class="door-content">
                 <h3>Türchen ${i}</h3>
+                <button class="story-btn" onclick="openStoryModal(${i})">📖 Geschichte lesen</button>
                 <input id="input${i}" value="${val}" placeholder="Deine Antwort">
                 <button onclick="saveAnswer(${i})">Speichern</button>
                 <button class="close-btn" onclick="toggleDoor(${i})">Schließen</button>
@@ -692,7 +853,7 @@
             container.appendChild(doorContainer);
           }
           
-          document.getElementById("progress").innerText = `abgeschlossen: ${answered}/24 `;
+          document.getElementById("progress").innerText = `abgeschlossen: ${answered}/24 🎁`;
         })
         .catch(error => {
           console.error("Fehler beim Laden:", error);
