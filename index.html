@@ -714,22 +714,22 @@
 
     // Check if door should be unlocked based on current date
     function isDoorUnlocked(doorNumber) {
-      const now = new Date();
-      const currentDay = now.getDate();
-      const currentMonth = now.getMonth() + 1; // 0-indexed
-      
-      // Only unlock in December and only up to current day
-      if (currentMonth === 12 && doorNumber <= currentDay) {
-        return true;
-      }
-      
-      // For testing: unlock all doors in other months
-      if (currentMonth !== 12) {
-        return true;
-      }
-      
-      return false;
-    }
+  const now = new Date();
+  const currentDay = now.getDate();
+  const currentMonth = now.getMonth() + 1; // 0-indexed
+  
+  // Only unlock in December and ONLY on the exact day
+  if (currentMonth === 12 && doorNumber === currentDay) {
+    return true;
+  }
+  
+  // For testing: unlock all doors in other months
+  if (currentMonth !== 12) {
+    return true;
+  }
+  
+  return false;
+}
 
     function login() {
       const name = document.getElementById("username").value.trim();
