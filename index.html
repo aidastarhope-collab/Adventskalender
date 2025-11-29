@@ -719,12 +719,12 @@
       const currentMonth = now.getMonth() + 1; // 0-indexed
       
       // Only unlock in December and only up to current day
-      if (currentMonth === 11 && doorNumber <= currentDay) {
+      if (currentMonth === 12 && doorNumber <= currentDay) {
         return true;
       }
       
       // For testing: unlock all doors in other months
-      if (currentMonth !== 11) {
+      if (currentMonth !== 12) {
         return true;
       }
       
